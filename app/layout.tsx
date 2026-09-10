@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { AuthProvider } from '@/lib/context/AuthContext'
 
 export const metadata: Metadata = {
   title: 'HazardShield - AI-Powered Hazard Zone Identification',
@@ -13,8 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="antialiased bg-gradient-to-br from-gray-50 via-white to-gray-50">
-        {children}
+      <body className="antialiased bg-gradient-to-br from-gray-50 via-white to-gray-50" suppressHydrationWarning>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   )

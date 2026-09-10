@@ -1,338 +1,143 @@
-# HazardShield - AI-Powered Geospatial Hazard Zone Platform
+# HazardShield - AI-Powered Geospatial Hazard Zone & Carrying Capacity Platform
+**Enterprise Disaster Governance Architecture**
 
-A complete Next.js frontend for hazard-zone identification, carrying capacity assessment, and relocation planning. Built for the Smart India Hackathon (SIH26191).
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+ installed
-- npm or yarn package manager
-
-### Installation & Running
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-npm start
-
-# Run linter
-npm run lint
-```
-
-The application will be available at `http://localhost:3000`
-
-## 📋 Project Structure
-
-```
-HazardShield/
-├── app/                          # Next.js App Router pages
-│   ├── layout.tsx               # Root layout with metadata
-│   ├── page.tsx                 # Dashboard/Home page
-│   ├── globals.css              # Global styles & animations
-│   ├── map/page.tsx             # Interactive Map View page
-│   ├── zones/page.tsx           # Risk Zones List page
-│   ├── relocation/page.tsx      # Relocation Priority Dashboard
-│   └── reports/page.tsx         # Reports & Export page
-├── components/                   # Reusable React components
-│   ├── Navbar.tsx               # Navigation bar with mobile menu
-│   ├── SummaryCard.tsx          # Dashboard metric cards
-│   ├── RiskBadge.tsx            # Risk level indicators
-│   ├── ZoneCard.tsx             # Zone information card
-│   ├── ZoneDetailPanel.tsx      # Detailed zone info sidebar
-│   ├── MapView.tsx              # Leaflet interactive map
-│   ├── ZonesTable.tsx           # Sortable zones table
-│   └── FilterBar.tsx            # Filter by hazard type & risk
-├── data/
-│   ├── hazardZones.ts           # Mock hazard zone data
-│   └── zones.ts                 # Alternative zone schema
-├── public/                       # Static assets
-├── package.json                 # Dependencies & scripts
-├── tailwind.config.ts           # Tailwind CSS configuration
-├── tsconfig.json                # TypeScript configuration
-├── next.config.js               # Next.js configuration
-├── postcss.config.js            # PostCSS configuration
-└── README.md                     # This file
-```
-
-## 🎨 Design System
-
-### Color Palette
-- **Risk Indicators:**
-  - `risk-high` (#DC2626) - Red for high-risk zones
-  - `risk-medium` (#F59E0B) - Amber for medium-risk zones
-  - `risk-low` (#10B981) - Green for low-risk zones
-  
-- **Primary Colors:**
-  - `accent` (#2563EB) - Primary blue for actions & highlights
-  - `foreground` (#0F172A) - Dark navy text
-  - `muted` (#FCF1F1) - Light background
-  - `border` (#FAE4E4) - Light border color
-
-### Typography
-- **Primary Font:** Fira Sans (system-ui fallback)
-- **Code Font:** Fira Code
-- **Base Size:** 16px
-- **Line Height:** 1.5
-
-### Spacing & Shadows
-- `shadow-soft` - Subtle shadows for cards
-- `shadow-card` - Medium shadows for card elevation
-- `shadow-hover` - Enhanced shadow on hover
-
-### Animations
-- `fade-in` - 0.2s fade entrance
-- `slide-up` - 0.3s upward slide entrance
-- `pulse-soft` - Gentle 2s pulse animation
-
-## 📄 Pages
-
-### 1. **Dashboard** (`/`)
-- Summary cards showing key metrics (total zones, high-risk zones, population at risk, pending relocations)
-- Top 3 priority zones for relocation
-- Quick statistics and call-to-action buttons
-- Clean hero section with navigation
-
-### 2. **Map View** (`/map`)
-- Interactive Leaflet map showing all hazard zones
-- Color-coded markers (red/yellow/green by risk level)
-- Marker size represents population density
-- Click markers to view detailed zone information
-- Side panel with zone details and urgency scores
-- Map legend and quick statistics
-
-### 3. **Risk Zones** (`/zones`)
-- Comprehensive table of all zones
-- Sortable columns: Name, Hazard Type, Risk Level, Population, Urgency
-- Filterable by hazard type and risk level
-- Capacity status indicators
-- Links to detailed zone information
-- Stats summary (total, high-risk, population, overcapacity)
-
-### 4. **Relocation Priority** (`/relocation`)
-- Ranked list of zones by urgency score
-- Priority levels: Critical (80+), High (60-79), Medium (<60)
-- Detailed information per zone including:
-  - Zone name and hazard type
-  - Risk level
-  - Population and carrying capacity
-  - Urgency score and reason
-  - Capacity status with overage information
-- Recommendations for relocation planning
-
-### 5. **Reports & Export** (`/reports`)
-- Generate PDF reports (Summary, Detailed, or Relocation Plan)
-- Report options: include map, include charts
-- Export data as CSV for spreadsheet analysis
-- Preview of report contents
-- Previous reports history
-- Current dashboard statistics
-
-## 🛠️ Tech Stack
-
-- **Framework:** Next.js 14.1.0 with App Router
-- **UI Library:** React 18.2.0
-- **Styling:** Tailwind CSS 3.4.1 + PostCSS
-- **Maps:** Leaflet 1.9.4 + React-Leaflet 4.2.1
-- **Data Visualization:** Recharts 2.12.0
-- **Icons:** Heroicons 2.1.1
-- **Language:** TypeScript 5.3.3
-
-## 📊 Mock Data
-
-The application uses comprehensive mock data for demonstration:
-- **8 Hazard Zones** with realistic data
-- Zones cover different hazard types: earthquakes, floods, landslides, cyclones
-- Real coordinates around Mumbai region (19.0760°N, 72.8777°E)
-- Population ranging from 3,200 to 18,000
-- Carrying capacity constraints showing overcrowding
-- Urgency scores from 28 to 95
-
-See [data/hazardZones.ts](data/hazardZones.ts) for complete mock data structure.
-
-## 🎯 Features
-
-### Core Functionality
-✅ Dashboard with real-time metrics
-✅ Interactive geospatial map with Leaflet
-✅ Comprehensive zone listing and filtering
-✅ Relocation priority ranking by urgency
-✅ PDF/CSV report generation interface
-✅ Responsive mobile-first design
-✅ Smooth animations and transitions
-✅ Accessible color-coded risk indicators
-✅ Real-time capacity status tracking
-✅ Sortable and filterable data tables
-
-### UI/UX
-✅ Premium, modern design (Stripe/Notion style)
-✅ Clean typography and proper spacing
-✅ Soft shadows and rounded corners
-✅ Smooth hover effects on interactive elements
-✅ Color-coded hazard risk levels throughout
-✅ Mobile-responsive layout
-✅ Accessible form controls and buttons
-✅ Clear visual hierarchy
-
-### Performance
-✅ Optimized component structure
-✅ Efficient data filtering and sorting
-✅ Lazy-loaded map visualization
-✅ Responsive images and SVG icons
-✅ CSS-based animations (GPU accelerated)
-
-## 🔧 Configuration
-
-### Environment Setup
-Create a `.env.local` file for environment-specific configuration:
-
-```bash
-# Backend API endpoints (when implemented)
-NEXT_PUBLIC_API_URL=http://localhost:8000/api
-
-# Map provider settings (if using cloud-based maps)
-NEXT_PUBLIC_MAPBOX_TOKEN=your_token_here
-```
-
-### Tailwind Customization
-Edit `tailwind.config.ts` to customize colors, fonts, spacing, or animations.
-
-### Next.js Configuration
-Modify `next.config.js` for optimizations or additional middleware.
-
-## 🔌 Integration Points
-
-The frontend is ready for backend integration:
-
-### Expected API Endpoints
-- `GET /api/zones` - Fetch all hazard zones
-- `GET /api/zones/:id` - Fetch specific zone details
-- `POST /api/zones/filter` - Filter zones by hazard type/risk level
-- `POST /api/relocation/priority` - Get prioritized relocation list
-- `POST /api/reports/generate` - Generate PDF/CSV reports
-- `GET /api/statistics` - Dashboard metrics
-
-### Data Structure Integration
-The `HazardZone` interface in [data/hazardZones.ts](data/hazardZones.ts) defines the expected data structure. Update API calls as needed to match your backend schema.
-
-## 📱 Responsive Breakpoints
-
-- **Mobile:** < 640px (default single column)
-- **Small Tablet:** 640px - 768px
-- **Medium:** 768px - 1024px (md breakpoint)
-- **Large:** 1024px - 1280px (lg breakpoint)
-- **XL:** > 1280px (xl breakpoint)
-
-## 🎨 Color Accessibility
-
-All color combinations follow WCAG AA standards:
-- Text contrast ratios ≥ 4.5:1
-- Color-coded information supplemented with icons/text
-- Support for reduced motion preferences
-- Clear focus states on interactive elements
-
-## 🚀 Production Deployment
-
-### Build Optimization
-```bash
-npm run build
-npm start
-```
-
-### Deployment Platforms
-- **Vercel** (Recommended for Next.js): `vercel deploy`
-- **Netlify**: Connect GitHub repository
-- **AWS Amplify**: AWS CLI deployment
-- **Docker**: Build containerized deployment
-
-### Environment Variables
-Set production environment variables on your hosting platform:
-- API endpoints
-- Map provider tokens
-- Analytics keys
-- CDN URLs
-
-## 📝 Future Enhancements
-
-- [ ] Real backend API integration
-- [ ] User authentication & authorization
-- [ ] Real-time WebSocket updates for zone status
-- [ ] Advanced analytics dashboard
-- [ ] PDF report generation with charts
-- [ ] Multi-language support (i18n)
-- [ ] Dark mode theme
-- [ ] 3D map visualization
-- [ ] Mobile app (React Native)
-- [ ] Data export to multiple formats
-- [ ] Historical trend analysis
-- [ ] Predictive modeling visualization
-
-## 📚 Documentation
-
-### Component Props
-Each component file includes JSDoc comments explaining props and usage.
-
-### Type Definitions
-TypeScript interfaces defined in data files ensure type safety:
-- `HazardZone` - Core zone data structure
-- `Zone` - Alternative zone schema (in zones.ts)
-
-## 🐛 Troubleshooting
-
-### Development Issues
-
-**Port 3000 already in use:**
-```bash
-npm run dev -- -p 3001
-```
-
-**Module not found errors:**
-```bash
-# Clear Next.js cache
-rm -rf .next
-
-# Reinstall dependencies
-rm -rf node_modules
-npm install
-```
-
-**TypeScript errors:**
-```bash
-# Run TypeScript compiler
-npx tsc --noEmit
-```
-
-### Map Issues
-- Ensure Leaflet CSS is properly imported in components
-- Check browser console for CORS issues with tile providers
-- Verify coordinates are in [latitude, longitude] format
-
-## 📞 Support
-
-For issues or questions:
-1. Check the [Next.js documentation](https://nextjs.org/docs)
-2. Review component files for usage examples
-3. Check Tailwind CSS utilities in configuration
-4. Consult Leaflet documentation for map features
-
-## 📄 License
-
-This project is part of Smart India Hackathon 2024-2025. Use and modify as needed for the competition and beyond.
-
-## 🎓 Learning Resources
-
-- [Next.js App Router Documentation](https://nextjs.org/docs/app)
-- [React Documentation](https://react.dev)
-- [Tailwind CSS Docs](https://tailwindcss.com/docs)
-- [Leaflet Documentation](https://leafletjs.com/reference.html)
-- [Recharts Documentation](https://recharts.org/)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+HazardShield is an end-to-end geospatial intelligence and disaster governance system built for real-time hazard-zone identification, dynamic carrying capacity assessment (ECC), and role-gated relocation planning.
 
 ---
 
-**Built with ❤️ for HazardShield - Smart India Hackathon 2026**
+## 🏛️ System Architecture
+
+```
+                                  HAZARDSHIELD PLATFORM
+                                 ═══════════════════════
+       ┌────────────────────────────┐              ┌────────────────────────────┐
+       │     COMMUNITY PORTAL       │              │      AUTHORITY PORTAL      │
+       │    (Citizens / Public)     │              │  (Municipal → MHA Tiers)   │
+       └──────────────┬─────────────┘              └──────────────┬─────────────┘
+                      │                                           │
+                      │ JWT (Role: community)                     │ JWT (Role: authority)
+                      ▼                                           ▼
+       ┌────────────────────────────────────────────────────────────────────────┐
+       │                   NODE.JS / EXPRESS CONSOLIDATED API                   │
+       │                              (Port 5000)                               │
+       │                                                                        │
+       │  • /api/auth/login (Dual-Role Login)                                   │
+       │  • /api/community/* (Dashboard, Risk Status, Report Hazard, Alerts)   │
+       │  • /api/authority/* (Dashboard, Verify, Score, Relocate, Alert, Export)│
+       │  • /api/zones, /api/relocation-priority (Backward-Compatible REST API) │
+       └──────────────┬───────────────────┬───────────────────────┬─────────────┘
+                      │                   │                       │
+      ISRO / InSAR    ▼                   ▼ HTTP /score-zone      ▼ Twilio & SendGrid
+  ┌──────────────────────┐    ┌──────────────────────┐    ┌─────────────────────┐
+  │ SATELLITE & WEATHER  │    │  FASTAPI RISK ENGINE │    │    ALERT SERVICE    │
+  │   TELEMETRY SYNC     │    │     (Port 8000)      │    │  SMS, Email & Push  │
+  │ • OpenWeatherMap     │    │ • DRS Calculation    │    │ • Twilio SMS        │
+  │ • ISRO Bhuvan InSAR  │    │ • Multi-Factor ECC   │    │ • SendGrid Email    │
+  │ • Hourly node-cron   │    │ • OCI & RPI Engine   │    │ • Sandbox Fallback  │
+  └──────────────────────┘    └──────────────────────┘    └─────────────────────┘
+                                          │
+                                          ▼
+                              ┌──────────────────────┐
+                              │   MONGODB DATABASE   │
+                              │  • User              │
+                              │  • Zone              │
+                              │  • HazardReport      │
+                              │  • RelocationPlan    │
+                              │  • Alert             │
+                              └──────────────────────┘
+```
+
+---
+
+## 🔄 Strict State Machine Workflow
+
+HazardShield enforces a closed-loop disaster risk governance sequence:
+
+1. **Citizen Report Submission**:
+   - Citizen submits a local hazard concern (`POST /api/community/report-hazard`).
+   - Stored with `pending_review` status.
+2. **Authority On-Ground Verification**:
+   - Gated to **DistrictAdmin or higher** (`PATCH /api/authority/hazard-reports/:id/verify`).
+   - Municipal attempts are rejected (HTTP 403).
+3. **Automated Risk Engine Re-Scoring**:
+   - Verification triggers FastAPI `/score-zone` microservice.
+   - Computes **Dynamic Risk Score (DRS)** and **Environmental Carrying Capacity (ECC)** across 4 limiting factors:
+     $$\text{DRS} = \text{MHI} \times \left[1 + \alpha \cdot \left(\frac{R_{\text{cum}} - R_{\text{thresh}}}{R_{\text{thresh}}}\right)\right]$$
+     $$\text{ECC} = \min(C_{\text{drainage}}, C_{\text{slope}}, C_{\text{evac}}, C_{\text{water}})$$
+   - Zone is dynamically reclassified (`red`, `yellow`, `green`).
+4. **Relocation Plan Generation**:
+   - If zone becomes `red` and population exceeds ECC ($OCI > 1.0$), a `pending_approval` relocation plan is created with TOPSIS-ranked shelter corridors.
+5. **State/National Executive Approval**:
+   - Gated strictly to **StateDMA or MHA** (`PATCH /api/authority/relocation/:id/approve`).
+   - Prerequisites checked: Requires prior verified hazard status before approval.
+6. **Multi-Channel Alert Broadcast**:
+   - Authority triggers emergency broadcast (`POST /api/authority/alerts/dispatch`).
+   - Alerts dispatched via Twilio SMS, SendGrid Email, and in-app feeds.
+7. **Citizen Receiving**:
+   - Citizens in affected zones immediately see the broadcast in `/api/community/alerts`.
+
+---
+
+## 🔑 Pre-Seeded Demonstration Credentials
+
+| Role | Authority Level | Email | Password | Scope / Permissions |
+| :--- | :--- | :--- | :--- | :--- |
+| **Community** | N/A | `citizen@hazardshield.com` | `citizen123` | View assigned zone risk, submit hazard reports, receive alerts |
+| **Authority** | `Municipal` | `municipal@hazardshield.com` | `muni123` | View dashboard, monitor ward reports |
+| **Authority** | `DistrictAdmin` | `district@hazardshield.com` | `district123` | Verify citizen hazard reports, score zones, dispatch alerts |
+| **Authority** | `StateDMA` | `state@hazardshield.com` | `state123` | Full state oversight + **Approve relocation plans** |
+| **Authority** | `MHA` | `admin@hazardshield.com` | `admin123` | National command, cross-state relocation, DDMA PDF dossiers |
+
+---
+
+## 🚀 Running Locally
+
+### 1. Prerequisites
+- **Node.js**: v18+
+- **Python**: v3.10+
+- **MongoDB**: Local MongoDB or auto-fallback to `mongodb-memory-server`
+
+### 2. Start the FastAPI Risk Engine
+```bash
+# In workspace root
+pip install -r risk_engine/requirements.txt
+python -m uvicorn risk_engine.main:app --host 127.0.0.1 --port 8000
+```
+
+### 3. Start the Node.js Express Backend
+```bash
+cd backend
+npm install
+npm start
+# Runs on http://localhost:5000 with auto-seeded demo data
+```
+
+### 4. Start the Next.js Frontend
+```bash
+# In workspace root
+npm install
+npm run dev
+# Runs on http://localhost:3000
+```
+
+---
+
+## 🧪 Automated Verification Suite
+
+Run the full end-to-end integration test suite verifying the dual-role architecture:
+```bash
+node backend/scratch/test_consolidated_workflow.js
+```
+*Result: 20 passed tests covering citizen reporting, role-gated verification, FastAPI scoring, StateDMA relocation approvals, alert dispatch, and DDMA PDF dossier generation.*
+
+---
+
+## 🌐 Deployment Configuration
+
+- **Render Blueprint**: `render.yaml` configures both the Express API and FastAPI microservice as coordinated services.
+- **Vercel Config**: `vercel.json` configures the Next.js frontend with production API URL mapping.
+
+---
+
+## 📄 License & Compliance
+Constituted in accordance with Section 25 & Section 34 of the **Disaster Management Act, 2005 (Act No. 53 of 2005)**, Government of India.

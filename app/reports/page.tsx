@@ -3,13 +3,17 @@
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import { hazardZonesData, mockReports } from '@/data/hazardZones';
-import { DocumentArrowDownIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { DocumentArrowDownIcon, CalendarIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import DdmaReportModal from '@/components/simulation/DdmaReportModal';
+import { useRequireAuth } from '@/lib/context/AuthContext';
 
 export default function ReportsPage() {
-  const [reportType, setReportType] = useState<'summary' | 'detailed' | 'relocation'>('summary');
+  const { isAuthorized } = useRequireAuth(['authority']);
+  const [reportType, setReportType] = useState<'summary' | 'detailed' | 'relocation' | 'ddma'>('ddma');
   const [includeMap, setIncludeMap] = useState(true);
   const [includCharts, setIncludeCharts] = useState(true);
+  const [showDdmaModal, setShowDdmaModal] = useState(false);
 
   const highRiskZones = hazardZonesData.filter((z) => z.riskLevel === 'high');
   const totalPopulation = hazardZonesData.reduce((sum, z) => sum + z.population, 0);
@@ -17,10 +21,22 @@ export default function ReportsPage() {
     .filter((z) => z.riskLevel === 'high' || z.riskLevel === 'medium')
     .reduce((sum, z) => sum + z.population, 0);
 
-  const handleGenerateReport = () => {
-    alert(
-      `Report generated successfully!\n\nType: ${reportType}\nInclude Map: ${includeMap}\nInclude Charts: ${includCharts}\n\nThis is a demo. In production, this would generate a real PDF file.`
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex items-center gap-3 text-gray-500 font-medium text-sm">
+          <svg className="animate-spin h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+          </svg>
+          Verifying Authority Command Authorization...
+        </div>
+      </div>
     );
+  }
+
+  const handleGenerateReport = () => {
+    setShowDdmaModal(true);
   };
 
   const handleDownloadCSV = () => {
@@ -69,6 +85,26 @@ export default function ReportsPage() {
                 <div className="mb-8">
                   <label className="block text-sm font-semibold text-gray-700 mb-4">Report Type</label>
                   <div className="space-y-3">
+                    <label className="flex items-center gap-3 p-4 border-2 border-emerald-500 bg-emerald-50/50 rounded-lg cursor-pointer hover:bg-emerald-50 transition-colors">
+                      <input
+                        type="radio"
+                        name="reportType"
+                        value="ddma"
+                        checked={reportType === 'ddma'}
+                        onChange={(e) => setReportType(e.target.value as 'ddma')}
+                        className="w-4 h-4 text-emerald-600"
+                      />
+                      <div>
+                        <p className="font-bold text-gray-900 flex items-center gap-2">
+                          <span>Official DDMA District Dossier</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] uppercase font-black bg-emerald-600 text-white">
+                            DM Act 2005
+                          </span>
+                        </p>
+                        <p className="text-xs text-gray-600">Official government letterhead, OCI analysis, max-flow bottlenecks & TOPSIS sites</p>
+                      </div>
+                    </label>
+
                     <label className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
                       <input
                         type="radio"
@@ -169,7 +205,9 @@ export default function ReportsPage() {
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
                     <h4 className="text-2xl font-bold text-foreground mb-2">HazardShield Report</h4>
                     <p className="text-sm text-gray-600 mb-4">{reportType.charAt(0).toUpperCase() + reportType.slice(1)}</p>
-                    <p className="text-xs text-gray-500">Generated on {new Date().toLocaleDateString()}</p>
+                    <p className="text-xs text-gray-500" suppressHydrationWarning>
+                      Generated on {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </p>
                   </div>
 
                   {/* Content Preview */}
@@ -217,9 +255,9 @@ export default function ReportsPage() {
                         <DocumentArrowDownIcon className="w-5 h-5 text-accent flex-shrink-0 mt-1" />
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-foreground text-sm truncate">{report.title}</p>
-                          <div className="flex items-center gap-1 text-xs text-gray-600 mt-1">
+                          <div className="flex items-center gap-1 text-xs text-gray-600 mt-1" suppressHydrationWarning>
                             <CalendarIcon className="w-3 h-3" />
-                            {new Date(report.date).toLocaleDateString()}
+                            {new Date(report.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                           </div>
                           <p className="text-xs text-gray-500 mt-1">
                             {report.zones} zones • {report.highRiskZones} high-risk
@@ -275,6 +313,13 @@ export default function ReportsPage() {
           </div>
         </section>
       </main>
+
+      <DdmaReportModal
+        isOpen={showDdmaModal}
+        onClose={() => setShowDdmaModal(false)}
+        zones={hazardZonesData}
+        simulatedRainfallMm={85}
+      />
     </>
   );
 }

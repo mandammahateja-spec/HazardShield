@@ -1,11 +1,20 @@
 'use client';
 
+import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import RiskBadge from '@/components/RiskBadge';
 import { hazardZonesData } from '@/data/hazardZones';
-import { ArrowPathIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { ArrowPathIcon, CheckCircleIcon, ExclamationTriangleIcon, ScaleIcon } from '@heroicons/react/24/outline';
+import TopsisRecommenderModal from '@/components/simulation/TopsisRecommenderModal';
+import EvacuationBottleneckModal from '@/components/simulation/EvacuationBottleneckModal';
+import { rankResettlementSitesTopsis } from '@/lib/engine/topsisEngine';
+import { useRequireAuth } from '@/lib/context/AuthContext';
 
 export default function RelocationPage() {
+  const { isAuthorized } = useRequireAuth(['authority']);
+  const [activeModal, setActiveModal] = useState<null | 'topsis' | 'bottlenecks'>(null);
+  const [modalZoneId, setModalZoneId] = useState<string>('zone_001');
+
   // Sort by urgency score (highest first)
   const prioritizedZones = [...hazardZonesData].sort((a, b) => b.urgencyScore - a.urgencyScore);
 
@@ -14,6 +23,20 @@ export default function RelocationPage() {
     high: prioritizedZones.filter((z) => z.urgencyScore >= 60 && z.urgencyScore < 80).length,
     medium: prioritizedZones.filter((z) => z.urgencyScore < 60).length,
   };
+
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex items-center gap-3 text-gray-500 font-medium text-sm">
+          <svg className="animate-spin h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+          </svg>
+          Verifying Authority Command Authorization...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -144,7 +167,7 @@ export default function RelocationPage() {
                         <p className="text-xs text-gray-600 font-semibold uppercase mb-2">Capacity Status</p>
                         {exceedance > 0 ? (
                           <div>
-                            <p className="text-sm font-bold text-risk-high">Over by {exceedance.toLocaleString()}</p>
+                            <p className="text-sm font-bold text-risk-high" suppressHydrationWarning>Over by {exceedance.toLocaleString('en-US')}</p>
                             <p className="text-xs text-gray-600 mt-1">
                               {Math.round((zone.population / zone.carryingCapacity) * 100)}% capacity
                             </p>
@@ -160,18 +183,43 @@ export default function RelocationPage() {
                       </div>
                     </div>
 
-                    {/* Reason */}
+                    {/* Reason & TOPSIS Recommendation */}
                     <div className="md:col-span-2">
-                      <div className="bg-white bg-opacity-60 p-3 rounded-lg border border-current border-opacity-20 h-full flex flex-col justify-center">
-                        <p className="text-xs text-gray-600 font-semibold uppercase mb-2">Reason</p>
-                        <p className="text-sm text-gray-700">{zone.reason}</p>
+                      <div className="bg-white bg-opacity-60 p-3 rounded-lg border border-current border-opacity-20 h-full flex flex-col justify-between">
+                        <div>
+                          <p className="text-xs text-gray-600 font-semibold uppercase mb-1">Reason</p>
+                          <p className="text-xs text-gray-700 mb-2">{zone.reason}</p>
+                        </div>
+                        {(() => {
+                          const topSite = rankResettlementSitesTopsis(zone)[0];
+                          return topSite ? (
+                            <div className="pt-1 border-t border-gray-200 text-[11px] text-emerald-800 font-medium">
+                              🎯 <strong>TOPSIS Site:</strong> {topSite.site.name} ({topSite.topsisScore.toFixed(2)})
+                            </div>
+                          ) : null;
+                        })()}
                       </div>
                     </div>
 
                     {/* Actions */}
-                    <div className="md:col-span-1 flex gap-2">
-                      <button className="flex-1 px-3 py-2 bg-accent text-white font-medium text-sm rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
-                        View Details
+                    <div className="md:col-span-1 flex flex-col gap-1.5 justify-center">
+                      <button
+                        onClick={() => {
+                          setModalZoneId(zone.id);
+                          setActiveModal('topsis');
+                        }}
+                        className="w-full py-1.5 px-2 bg-accent text-white font-semibold text-xs rounded-lg hover:bg-blue-700 transition-colors truncate shadow-sm"
+                      >
+                        TOPSIS Sites
+                      </button>
+                      <button
+                        onClick={() => {
+                          setModalZoneId(zone.id);
+                          setActiveModal('bottlenecks');
+                        }}
+                        className="w-full py-1.5 px-2 bg-indigo-50 text-indigo-700 font-semibold text-xs rounded-lg hover:bg-indigo-100 transition-colors truncate border border-indigo-200"
+                      >
+                        Evac Flow
                       </button>
                     </div>
                   </div>
@@ -195,6 +243,23 @@ export default function RelocationPage() {
           </div>
         </section>
       </main>
+
+      {/* Modals */}
+      <TopsisRecommenderModal
+        isOpen={activeModal === 'topsis'}
+        onClose={() => setActiveModal(null)}
+        zones={hazardZonesData}
+        selectedZoneId={modalZoneId}
+        onSelectZoneId={setModalZoneId}
+      />
+
+      <EvacuationBottleneckModal
+        isOpen={activeModal === 'bottlenecks'}
+        onClose={() => setActiveModal(null)}
+        zones={hazardZonesData}
+        selectedZoneId={modalZoneId}
+        onSelectZoneId={setModalZoneId}
+      />
     </>
   );
 }

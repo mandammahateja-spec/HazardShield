@@ -6,8 +6,10 @@ import ZonesTable from '@/components/ZonesTable';
 import FilterBar from '@/components/FilterBar';
 import { hazardZonesData, HazardZone } from '@/data/hazardZones';
 import { TableCellsIcon } from '@heroicons/react/24/outline';
+import { useRequireAuth } from '@/lib/context/AuthContext';
 
 export default function ZonesPage() {
+  const { isAuthorized } = useRequireAuth(['authority']);
   const [selectedHazard, setSelectedHazard] = useState('all');
   const [selectedRisk, setSelectedRisk] = useState('all');
   const [selectedZone, setSelectedZone] = useState<HazardZone | null>(null);
@@ -26,6 +28,20 @@ export default function ZonesPage() {
     population: filteredZones.reduce((sum, z) => sum + z.population, 0),
     overCapacity: filteredZones.filter((z) => z.population > z.carryingCapacity).length,
   };
+
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex items-center gap-3 text-gray-500 font-medium text-sm">
+          <svg className="animate-spin h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+          </svg>
+          Verifying Authority Command Authorization...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

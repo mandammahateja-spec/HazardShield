@@ -57,8 +57,8 @@ export default function ZoneCard({ zone, onClick, showActions = true }: ZoneCard
           ></div>
         </div>
         {exceedance > 0 && (
-          <p className="text-xs text-risk-high font-semibold mt-1">
-            Exceeds by {exceedance.toLocaleString()} people
+          <p className="text-xs text-risk-high font-semibold mt-1" suppressHydrationWarning>
+            Exceeds by {exceedance.toLocaleString('en-US')} people
           </p>
         )}
       </div>

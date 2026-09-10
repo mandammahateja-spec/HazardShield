@@ -113,8 +113,8 @@ export default function ZoneDetailPanel({ zone, onClose }: ZoneDetailPanelProps)
         </div>
 
         {/* Last Updated */}
-        <div className="text-xs text-gray-500 p-3 bg-muted rounded-lg">
-          <p>Last updated: {new Date(zone.lastUpdated).toLocaleDateString()}</p>
+        <div className="text-xs text-gray-500 p-3 bg-muted rounded-lg" suppressHydrationWarning>
+          <p>Last updated: {new Date(zone.lastUpdated).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
         </div>
       </div>
 
