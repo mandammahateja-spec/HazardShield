@@ -19,7 +19,7 @@ let mongoServer = null;
  *    mongodb-memory-server (zero-install dev experience).
  */
 const connectDB = async () => {
-  const uri = process.env.MONGO_URI;
+  const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
 
   // Try external MongoDB first
   try {
