@@ -7,8 +7,9 @@ import ZoneDetailPanel from '@/components/ZoneDetailPanel';
 import { hazardZonesData, HazardZone } from '@/data/hazardZones';
 import EvacuationBottleneckModal from '@/components/simulation/EvacuationBottleneckModal';
 import TopsisRecommenderModal from '@/components/simulation/TopsisRecommenderModal';
+import MlHazardPredictorModal from '@/components/simulation/MlHazardPredictorModal';
 import { useRequireAuth } from '@/lib/context/AuthContext';
-import { MapIcon, CloudArrowDownIcon } from '@heroicons/react/24/outline';
+import { MapIcon, CloudArrowDownIcon, CpuChipIcon } from '@heroicons/react/24/outline';
 
 const MapView = dynamic(() => import('@/components/MapView'), {
   ssr: false,
@@ -23,7 +24,7 @@ export default function MapViewPage() {
   const [selectedZone, setSelectedZone] = useState<HazardZone | null>(null);
   const [showPanel, setShowPanel] = useState(false);
   const [simulatedRainfallMm, setSimulatedRainfallMm] = useState<number>(0);
-  const [activeModal, setActiveModal] = useState<null | 'bottlenecks' | 'topsis'>(null);
+  const [activeModal, setActiveModal] = useState<null | 'bottlenecks' | 'topsis' | 'ml'>(null);
   const [modalZoneId, setModalZoneId] = useState<string>('zone_001');
 
   const [selectedHazard, setSelectedHazard] = useState<string>('all');
@@ -46,6 +47,11 @@ export default function MapViewPage() {
   const handleOpenResettlement = (zone: HazardZone) => {
     setModalZoneId(zone.id);
     setActiveModal('topsis');
+  };
+
+  const handleOpenMlPredictor = (zone: HazardZone) => {
+    setModalZoneId(zone.id);
+    setActiveModal('ml');
   };
 
   const { isAuthorized } = useRequireAuth(['authority']);
@@ -82,32 +88,54 @@ export default function MapViewPage() {
                 </p>
               </div>
 
-              {/* In-Map Rainfall Scrubber */}
-              <div className="bg-slate-900 text-white p-3.5 rounded-xl border border-indigo-500/30 flex items-center gap-3 shadow-md">
-                <CloudArrowDownIcon className="w-6 h-6 text-amber-400 flex-shrink-0 animate-pulse" />
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between text-xs gap-3">
-                    <span className="text-slate-300 font-medium">Rainfall Simulation:</span>
-                    <span className="font-mono font-bold text-amber-400">{simulatedRainfallMm} mm</span>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                {/* 72h ML Predictor Trigger */}
+                <button
+                  onClick={() => {
+                    if (selectedZone) setModalZoneId(selectedZone.id);
+                    setActiveModal('ml');
+                  }}
+                  className="bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 hover:from-indigo-800 hover:to-slate-800 text-white p-3 rounded-xl border border-indigo-500/40 flex items-center gap-3 shadow-md transition-all group cursor-pointer"
+                >
+                  <CpuChipIcon className="w-6 h-6 text-amber-300 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                  <div className="text-left">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-white">72h ML Predictor</span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/30 text-emerald-300">
+                        ROC-AUC 0.94
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 font-medium">Random Forest Inference</p>
                   </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="300"
-                    step="10"
-                    value={simulatedRainfallMm}
-                    onChange={(e) => setSimulatedRainfallMm(Number(e.target.value))}
-                    className="w-40 h-2 bg-slate-700 rounded appearance-none cursor-pointer accent-amber-400"
-                  />
+                </button>
+
+                {/* In-Map Rainfall Scrubber */}
+                <div className="bg-slate-900 text-white p-3.5 rounded-xl border border-indigo-500/30 flex items-center gap-3 shadow-md">
+                  <CloudArrowDownIcon className="w-6 h-6 text-amber-400 flex-shrink-0 animate-pulse" />
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-xs gap-3">
+                      <span className="text-slate-300 font-medium">Rainfall Simulation:</span>
+                      <span className="font-mono font-bold text-amber-400">{simulatedRainfallMm} mm</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="300"
+                      step="10"
+                      value={simulatedRainfallMm}
+                      onChange={(e) => setSimulatedRainfallMm(Number(e.target.value))}
+                      className="w-40 h-2 bg-slate-700 rounded appearance-none cursor-pointer accent-amber-400"
+                    />
+                  </div>
+                  {simulatedRainfallMm > 0 && (
+                    <button
+                      onClick={() => setSimulatedRainfallMm(0)}
+                      className="text-[10px] px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-semibold transition-colors"
+                    >
+                      Reset
+                    </button>
+                  )}
                 </div>
-                {simulatedRainfallMm > 0 && (
-                  <button
-                    onClick={() => setSimulatedRainfallMm(0)}
-                    className="text-[10px] px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-semibold transition-colors"
-                  >
-                    Reset
-                  </button>
-                )}
               </div>
             </div>
 
@@ -234,6 +262,7 @@ export default function MapViewPage() {
                       setShowPanel(false);
                       setSelectedZone(null);
                     }}
+                    onOpenMlPredictor={handleOpenMlPredictor}
                   />
                   <div className="grid grid-cols-2 gap-2">
                     <button
@@ -280,6 +309,14 @@ export default function MapViewPage() {
 
       <TopsisRecommenderModal
         isOpen={activeModal === 'topsis'}
+        onClose={() => setActiveModal(null)}
+        zones={hazardZonesData}
+        selectedZoneId={modalZoneId}
+        onSelectZoneId={setModalZoneId}
+      />
+
+      <MlHazardPredictorModal
+        isOpen={activeModal === 'ml'}
         onClose={() => setActiveModal(null)}
         zones={hazardZonesData}
         selectedZoneId={modalZoneId}

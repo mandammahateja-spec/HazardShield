@@ -1,13 +1,14 @@
 import { HazardZone } from '@/data/hazardZones';
 import RiskBadge from './RiskBadge';
-import { XMarkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ExclamationTriangleIcon, CpuChipIcon, SparklesIcon } from '@heroicons/react/24/outline';
 
 interface ZoneDetailPanelProps {
   zone: HazardZone;
   onClose: () => void;
+  onOpenMlPredictor?: (zone: HazardZone) => void;
 }
 
-export default function ZoneDetailPanel({ zone, onClose }: ZoneDetailPanelProps) {
+export default function ZoneDetailPanel({ zone, onClose, onOpenMlPredictor }: ZoneDetailPanelProps) {
   const capacityPercentage = ((zone.population / zone.carryingCapacity) * 100).toFixed(0);
   const exceedance = Math.max(0, zone.population - zone.carryingCapacity);
 
@@ -133,6 +134,33 @@ export default function ZoneDetailPanel({ zone, onClose }: ZoneDetailPanelProps)
             )}
           </div>
         )}
+
+        {/* 72H ML PREDICTION & EXPLAINABILITY CARD */}
+        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-4 space-y-2.5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CpuChipIcon className="w-4 h-4 text-indigo-700" />
+              <span className="text-xs font-bold text-indigo-950 uppercase tracking-wider">
+                72h ML Hazard Prediction
+              </span>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-200 text-indigo-900 border border-indigo-300">
+              ROC-AUC 0.94
+            </span>
+          </div>
+          <p className="text-xs text-indigo-900 leading-relaxed">
+            FastAPI Random Forest classifier forecasts 72-hour hazard breach probability with Explainable AI (XAI) feature attribution.
+          </p>
+          {onOpenMlPredictor && (
+            <button
+              onClick={() => onOpenMlPredictor(zone)}
+              className="w-full py-2 px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+            >
+              <SparklesIcon className="w-4 h-4 text-amber-300" />
+              <span>Simulate Live ML Prediction (72h Forecast) →</span>
+            </button>
+          )}
+        </div>
 
         {/* Urgency & Reason */}
         <div>
