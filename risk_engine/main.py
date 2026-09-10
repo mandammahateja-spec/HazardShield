@@ -1,11 +1,22 @@
 import math
+import os
+import sys
 from typing import Optional, List, Dict, Any
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-# ML Inference imports
-from risk_engine.ml.predict import predict_hazard, is_model_available
+# Ensure both workspace root and risk_engine directory are in sys.path
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PARENT_DIR = os.path.dirname(CURRENT_DIR)
+for p in (CURRENT_DIR, PARENT_DIR):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+try:
+    from risk_engine.ml.predict import predict_hazard, is_model_available
+except ImportError:
+    from ml.predict import predict_hazard, is_model_available
 
 app = FastAPI(
     title="HazardShield Risk & ML Prediction Engine",

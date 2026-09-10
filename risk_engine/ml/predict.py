@@ -13,16 +13,26 @@ import joblib
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 RISK_ENGINE_DIR = os.path.dirname(CURRENT_DIR)
 WORKSPACE_DIR = os.path.dirname(RISK_ENGINE_DIR)
-if WORKSPACE_DIR not in sys.path:
-    sys.path.insert(0, WORKSPACE_DIR)
+for p in (CURRENT_DIR, RISK_ENGINE_DIR, WORKSPACE_DIR):
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
-from risk_engine.ml.preprocess import (
-    RAW_NUMERIC_FEATURES,
-    ALL_MODEL_FEATURES,
-    DEFAULT_FEATURE_VALUES,
-    engineer_features,
-    validate_input_dict,
-)
+try:
+    from risk_engine.ml.preprocess import (
+        RAW_NUMERIC_FEATURES,
+        ALL_MODEL_FEATURES,
+        DEFAULT_FEATURE_VALUES,
+        engineer_features,
+        validate_input_dict,
+    )
+except ImportError:
+    from ml.preprocess import (
+        RAW_NUMERIC_FEATURES,
+        ALL_MODEL_FEATURES,
+        DEFAULT_FEATURE_VALUES,
+        engineer_features,
+        validate_input_dict,
+    )
 
 # Global in-memory cache
 _LOADED_MODEL = None

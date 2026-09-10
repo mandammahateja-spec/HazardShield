@@ -7,9 +7,20 @@ import numpy as np
 import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.base import BaseEstimator, ClassifierMixin
+import os
+import sys
 
-from risk_engine.ml.preprocess import build_preprocessor_pipeline, ALL_MODEL_FEATURES
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+RISK_ENGINE_DIR = os.path.dirname(CURRENT_DIR)
+WORKSPACE_DIR = os.path.dirname(RISK_ENGINE_DIR)
+for p in (CURRENT_DIR, RISK_ENGINE_DIR, WORKSPACE_DIR):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+try:
+    from risk_engine.ml.preprocess import build_preprocessor_pipeline, ALL_MODEL_FEATURES
+except ImportError:
+    from ml.preprocess import build_preprocessor_pipeline, ALL_MODEL_FEATURES
 
 def create_hazard_model(
     n_estimators: int = 150,
