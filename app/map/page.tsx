@@ -26,6 +26,12 @@ export default function MapViewPage() {
   const [activeModal, setActiveModal] = useState<null | 'bottlenecks' | 'topsis'>(null);
   const [modalZoneId, setModalZoneId] = useState<string>('zone_001');
 
+  const [selectedHazard, setSelectedHazard] = useState<string>('all');
+
+  const filteredMapZones = selectedHazard === 'all'
+    ? hazardZonesData
+    : hazardZonesData.filter((z) => z.hazardType === selectedHazard);
+
   const handleZoneClick = (zone: HazardZone) => {
     setSelectedZone(zone);
     setModalZoneId(zone.id);
@@ -69,10 +75,10 @@ export default function MapViewPage() {
               <div>
                 <div className="flex items-center gap-3 mb-1">
                   <MapIcon className="w-8 h-8 text-accent" />
-                  <h1 className="text-3xl font-bold text-foreground">Interactive Hazard Map</h1>
+                  <h1 className="text-3xl font-bold text-foreground">Interactive Multi-Hazard GIS Map</h1>
                 </div>
                 <p className="text-gray-600 text-sm max-w-2xl">
-                  Real-time geospatial intelligence: markers dynamically shift color (Green→Yellow→Red) as rainfall threshold is breached. Red dashed lines denote evacuation bottlenecks.
+                  Real-time geospatial intelligence: markers dynamically update risk scores. Shaded red zones denote official non-habitable Red Zones. Green shield markers represent safer alternative reception sites.
                 </p>
               </div>
 
@@ -104,6 +110,61 @@ export default function MapViewPage() {
                 )}
               </div>
             </div>
+
+            {/* Hazard Filters Bar */}
+            <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-100 flex-wrap">
+              <span className="text-xs font-bold text-slate-500 uppercase mr-1">Hazard Layer:</span>
+              <button
+                onClick={() => setSelectedHazard('all')}
+                className={`text-xs px-3 py-1 rounded-lg font-bold transition-colors ${
+                  selectedHazard === 'all'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                All Multi-Hazards ({hazardZonesData.length})
+              </button>
+              <button
+                onClick={() => setSelectedHazard('landslide')}
+                className={`text-xs px-3 py-1 rounded-lg font-bold transition-colors ${
+                  selectedHazard === 'landslide'
+                    ? 'bg-orange-600 text-white'
+                    : 'bg-orange-50 text-orange-800 hover:bg-orange-100'
+                }`}
+              >
+                ⛰️ Landslides
+              </button>
+              <button
+                onClick={() => setSelectedHazard('flood')}
+                className={`text-xs px-3 py-1 rounded-lg font-bold transition-colors ${
+                  selectedHazard === 'flood'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-blue-50 text-blue-800 hover:bg-blue-100'
+                }`}
+              >
+                🌊 Floods
+              </button>
+              <button
+                onClick={() => setSelectedHazard('coastal_erosion')}
+                className={`text-xs px-3 py-1 rounded-lg font-bold transition-colors ${
+                  selectedHazard === 'coastal_erosion'
+                    ? 'bg-teal-600 text-white'
+                    : 'bg-teal-50 text-teal-800 hover:bg-teal-100'
+                }`}
+              >
+                🏖️ Coastal Erosion
+              </button>
+              <button
+                onClick={() => setSelectedHazard('cloudburst')}
+                className={`text-xs px-3 py-1 rounded-lg font-bold transition-colors ${
+                  selectedHazard === 'cloudburst'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-purple-50 text-purple-800 hover:bg-purple-100'
+                }`}
+              >
+                ⚡ Cloudbursts
+              </button>
+            </div>
           </div>
         </section>
 
@@ -114,11 +175,13 @@ export default function MapViewPage() {
             <div className="lg:col-span-2">
               <div className="h-[600px] lg:h-[720px]">
                 <MapView
-                  zones={hazardZonesData}
+                  zones={filteredMapZones}
                   onZoneClick={handleZoneClick}
                   selectedZone={selectedZone}
                   simulatedRainfallMm={simulatedRainfallMm}
                   showEvacuationRoutes={true}
+                  showRedZonePolygons={true}
+                  showSafeResettlementSites={true}
                   onOpenBottlenecks={handleOpenBottlenecks}
                   onOpenResettlement={handleOpenResettlement}
                 />
@@ -148,16 +211,16 @@ export default function MapViewPage() {
                     <span className="text-gray-700">Low Risk Baseline (DRS &lt; 45)</span>
                   </div>
                   <div className="flex items-center gap-3 pt-2 border-t">
+                    <div className="w-5 h-5 rounded-full bg-emerald-600 border border-emerald-900"></div>
+                    <span className="text-emerald-800 font-bold">🛡️ Safer Alternative Reception Site</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 bg-red-200 border border-dashed border-red-600 rounded"></div>
+                    <span className="text-red-700 font-bold">🚨 Non-Habitable Red Zone Polygon</span>
+                  </div>
+                  <div className="flex items-center gap-3">
                     <div className="w-5 h-5 rounded-full border-2 border-dashed border-red-600 bg-red-100"></div>
                     <span className="text-rose-700 font-bold">Pulsing Ring: OCI &gt; 1.0 (Overcapacity)</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-1 border-t-2 border-dashed border-red-600"></div>
-                    <span className="text-rose-700 font-bold">Red Dashed Line: Evac Chokepoint Bridge</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-1 bg-blue-600"></div>
-                    <span className="text-blue-700">Blue Line: Safe Evacuation Corridor</span>
                   </div>
                 </div>
               </div>

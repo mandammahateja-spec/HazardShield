@@ -22,6 +22,16 @@ const relocationPlanSchema = new mongoose.Schema(
       },
       default: 'pending_approval',
     },
+    relocationTier: {
+      type: String,
+      enum: ['immediate', 'short_term', 'medium_term'],
+      default: 'immediate',
+      index: true,
+    },
+    timelineEstimate: {
+      type: String,
+      default: '< 30 Days',
+    },
     reason: {
       type: String,
       required: [true, 'Reason for relocation is required'],
@@ -39,11 +49,21 @@ const relocationPlanSchema = new mongoose.Schema(
     },
     targetSettlementSites: [
       {
+        siteId: String,
         siteName: String,
+        location: String,
         topsisScore: Number,
         availableCapacity: Number,
+        slopeDegrees: Number,
+        waterLpcd: Number,
+        limitingFactor: String,
+        suitabilityGrade: String,
       },
     ],
+    sdmaActionDirectives: {
+      type: [String],
+      default: [],
+    },
     approvedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

@@ -24,6 +24,9 @@ class ZoneScoreInput(BaseModel):
     hazard_type: Optional[str] = "flood"
     population: int = Field(..., gt=0, description="Actual population count (P_actual)")
     mhi_baseline: Optional[float] = Field(50.0, ge=0.0, le=100.0, description="Multi-Hazard Index baseline")
+    hazard_intensity_score: Optional[float] = Field(50.0, ge=0.0, le=100.0, description="Peak hazard intensity (rainfall, slope shear, wave height, cloudburst rate)")
+    vulnerability_score: Optional[float] = Field(50.0, ge=0.0, le=100.0, description="Social & infrastructure vulnerability index (0-100)")
+    disaster_history_score: Optional[float] = Field(50.0, ge=0.0, le=100.0, description="Historical recurrence frequency and cumulative disaster damage (0-100)")
     rainfall_mm: Optional[float] = Field(0.0, ge=0.0, description="72-hour simulated or actual cumulative rainfall (R_cum)")
     rainfall_thresh: Optional[float] = Field(85.0, gt=0.0, description="Zone rainfall threshold (R_thresh)")
     alpha: Optional[float] = Field(1.0, gt=0.0, description="Terrain soil saturation sensitivity coefficient")
@@ -43,10 +46,15 @@ class ZoneScoreOutput(BaseModel):
     hazard_type: str
     population: int
     mhi_baseline: float
+    hazard_intensity_score: float
+    vulnerability_score: float
+    disaster_history_score: float
     drs_score: float
     ecc_capacity: int
     oci_score: float
     classification: str
+    is_red_zone: bool
+    relocation_tier: str
     is_overcapacity: bool = Field(alias="is_overcapacity")
     limiting_factor: str
     rpi_urgency_score: float
@@ -57,34 +65,43 @@ class ZoneScoreOutput(BaseModel):
 def health_check():
     return {
         "status": "healthy",
-        "service": "HazardShield Risk Engine Microservice",
+        "service": "HazardShield Multi-Hazard & Carrying Capacity Risk Engine",
         "framework": "FastAPI",
-        "version": "1.0.0"
+        "version": "1.1.0",
+        "supported_hazards": ["landslide", "flood", "coastal_erosion", "cloudburst", "earthquake", "cyclone"]
     }
 
 @app.post("/score-zone")
 def score_zone(input_data: ZoneScoreInput):
     """
-    Computes DRS, ECC, and OCI using the formalized mathematical models:
-    - DRS = MHI * [ 1 + alpha * ((R_cum - R_thresh) / R_thresh) ]
-    - ECC = min(RCC, C_water, C_sewer, C_power, C_transport, C_evac)
-    - OCI = P_actual / ECC
+    Computes DRS, ECC, OCI, Red Zone designation, and 3-tier relocation prioritization using:
+    - 3-Pillar Evidence: Hazard Intensity (40%), Vulnerability (35%), Disaster History (25%)
+    - Dynamic Risk Score: DRS = Pillar_Baseline * [ 1 + alpha * ((R_cum - R_thresh) / R_thresh) ]
+    - Multi-factor Carrying Capacity: ECC = min(RCC, C_water, C_sewer, C_power, C_transport, C_evac)
+    - Relocation Horizon: Immediate (<30 days), Short-Term (1-6 months), Medium-Term (6-24 months)
     """
     try:
-        # 1. Dynamic Risk Score (DRS) Calculation
-        mhi = input_data.mhi_baseline or 50.0
+        # 1. Three-Pillar Baseline Integration
+        h_score = input_data.hazard_intensity_score if input_data.hazard_intensity_score is not None else 50.0
+        v_score = input_data.vulnerability_score if input_data.vulnerability_score is not None else 50.0
+        d_score = input_data.disaster_history_score if input_data.disaster_history_score is not None else 50.0
+
+        # Weighted composite baseline
+        pillar_baseline = (0.40 * h_score) + (0.35 * v_score) + (0.25 * d_score)
+        base_mhi = input_data.mhi_baseline if (input_data.mhi_baseline and input_data.mhi_baseline != 50.0) else pillar_baseline
+
         r_cum = input_data.rainfall_mm or 0.0
         r_thresh = input_data.rainfall_thresh or 85.0
         alpha = input_data.alpha or 1.0
 
         if r_cum <= 0.0:
-            drs = mhi
+            drs = base_mhi
         elif r_cum <= r_thresh:
             sub_factor = (r_cum / r_thresh) * 0.12 * alpha
-            drs = mhi * (1.0 + sub_factor)
+            drs = base_mhi * (1.0 + sub_factor)
         else:
             surge_ratio = (r_cum - r_thresh) / r_thresh
-            drs = mhi * (1.0 + alpha * surge_ratio)
+            drs = base_mhi * (1.0 + alpha * surge_ratio)
 
         # Citizen verification escalation: verified on-ground reports increase empirical severity
         if input_data.verified_hazard_reports_count > 0:
@@ -98,15 +115,10 @@ def score_zone(input_data: ZoneScoreInput):
         rcc = input_data.rcc or 8000
         lpcd = max(20.0, input_data.water_lpcd or 135.0)
 
-        # C_water = (MLD * 10^6) / LPCD
         c_water = int((input_data.water_supply_mld * 1000000) / lpcd)
-        # C_sewer = (MLD * 10^6) / (0.8 * LPCD)
         c_sewer = int((input_data.sewer_treatment_mld * 1000000) / max(15.0, 0.8 * lpcd))
-        # C_power = (MW * 1000 kW) / 0.35 kW per capita
         c_power = int((input_data.power_mw * 1000) / 0.35)
-        # C_transport = (Lanes * 1250 p/hr) * target_evac_hours
         c_transport = int((input_data.lane_count * 1250) * input_data.target_evac_hours)
-        # C_evac = evac_flow_rate * target_evac_hours
         c_evac = int(input_data.evac_flow_rate * input_data.target_evac_hours)
 
         capacities = [
@@ -126,8 +138,9 @@ def score_zone(input_data: ZoneScoreInput):
         oci = round(raw_oci, 2)
         is_overcapacity = oci > 1.0
 
-        # 4. Zone Classification
-        if drs >= 70.0 or (drs >= 60.0 and is_overcapacity):
+        # 4. Zone Classification & Red Zone Status (Unsuitable for Habitation)
+        is_red_zone = drs >= 70.0 or (drs >= 60.0 and is_overcapacity)
+        if is_red_zone:
             classification = "red"
         elif drs >= 45.0:
             classification = "yellow"
@@ -139,25 +152,35 @@ def score_zone(input_data: ZoneScoreInput):
         rpi = round(0.6 * drs + 0.4 * oci_factor, 1)
         rpi = min(100.0, max(0.0, rpi))
 
-        if classification == "red" and is_overcapacity:
-            recommended_action = "Mandatory Phased Relocation Protocol Required (Section 34, DM Act 2005)"
-        elif classification == "red":
-            recommended_action = "Pre-emptive Evacuation Standby & Route Marshalling"
-        elif classification == "yellow":
-            recommended_action = "Active Ward Monitoring & Drainage Inspection"
+        # 6. Relocation Horizon Categorization (Immediate / Short-Term / Medium-Term)
+        if rpi >= 75.0 or (classification == "red" and oci >= 1.3):
+            relocation_tier = "immediate"
+            recommended_action = "Immediate Relocation Directive (<30 Days): Critical Red Zone breach. Marshall transitional shelters & trigger Section 34 DM Act evacuation."
+        elif rpi >= 60.0 or classification == "red":
+            relocation_tier = "short_term"
+            recommended_action = "Short-Term Pre-Monsoon Relocation (1-6 Months): High risk of recurrence. Activate priority resettlement corridors."
+        elif rpi >= 40.0:
+            relocation_tier = "medium_term"
+            recommended_action = "Medium-Term Phased Resettlement (6-24 Months): Vulnerable habitation buffer. Schedule infrastructure expansion at alternative sites."
         else:
-            recommended_action = "Routine Environmental Observation"
+            relocation_tier = "monitoring"
+            recommended_action = "Active Geological & Telemetry Monitoring: Habitation remains within tolerable carrying capacity limits."
 
         return {
             "zone_id": input_data.zone_id,
             "zone_name": input_data.zone_name,
-            "hazard_type": input_data.hazard_type,
+            "hazard_type": input_data.hazard_type or "flood",
             "population": p_actual,
-            "mhi_baseline": mhi,
+            "mhi_baseline": round(base_mhi, 1),
+            "hazard_intensity_score": round(h_score, 1),
+            "vulnerability_score": round(v_score, 1),
+            "disaster_history_score": round(d_score, 1),
             "drs_score": drs,
             "ecc_capacity": ecc,
             "oci_score": oci,
             "classification": classification,
+            "is_red_zone": is_red_zone,
+            "relocation_tier": relocation_tier,
             "is_overcapacity": is_overcapacity,
             "limiting_factor": limiting_name,
             "rpi_urgency_score": rpi,

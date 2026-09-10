@@ -1,6 +1,6 @@
 import { HazardZone } from '@/data/hazardZones';
 import RiskBadge from './RiskBadge';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface ZoneDetailPanelProps {
   zone: HazardZone;
@@ -11,60 +11,140 @@ export default function ZoneDetailPanel({ zone, onClose }: ZoneDetailPanelProps)
   const capacityPercentage = ((zone.population / zone.carryingCapacity) * 100).toFixed(0);
   const exceedance = Math.max(0, zone.population - zone.carryingCapacity);
 
-  const hazardDescriptions = {
-    earthquake: 'Seismic activity risk with potential for structural damage',
-    flood: 'Riverine or coastal flooding risk during monsoon or storm surge',
-    landslide: 'Slope instability and debris flow risk on steep terrain',
-    cyclone: 'Tropical cyclone and severe wind risk',
+  const hazardDescriptions: Record<string, string> = {
+    landslide: 'High-slope shear instability and debris flow risk on steep ghat terrain',
+    flood: 'Fluvial riverbed overtopping or severe drainage inundation during monsoon',
+    coastal_erosion: 'Severe shoreline scour, wave overwash, and coastal embankment loss',
+    cloudburst: 'Extreme sudden convective orographic downpour causing high-velocity ravine flash floods',
+    earthquake: 'High seismic ground acceleration with building collapse vulnerability',
+    cyclone: 'Tropical cyclone storm surge and gale-force wind inundation',
   };
 
   return (
     <div className="bg-white rounded-xl shadow-hover border border-gray-200 overflow-hidden animate-slide-up flex flex-col h-full">
       {/* Header */}
-      <div className="bg-gradient-to-r from-muted to-white p-6 border-b border-border">
-        <div className="flex items-start justify-between mb-4">
+      <div className="bg-gray-50 text-foreground p-6 border-b border-border">
+        <div className="flex items-start justify-between mb-3">
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">{zone.name}</h2>
-            <RiskBadge level={zone.riskLevel} />
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[11px] font-mono font-semibold uppercase bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                {zone.state || 'India'}
+              </span>
+              {zone.redZoneStatus?.isRedZone && (
+                <span className="text-[11px] font-bold uppercase bg-red-100 text-red-800 border border-red-300 px-2 py-0.5 rounded">
+                  Unsuitable For Habitation
+                </span>
+              )}
+            </div>
+            <h2 className="text-xl font-bold text-foreground mb-2">{zone.name}</h2>
+            <div className="flex items-center gap-2">
+              <RiskBadge level={zone.riskLevel} />
+              {zone.relocationTier && (
+                <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${
+                  zone.relocationTier === 'immediate'
+                    ? 'bg-red-100 text-red-800 border-red-300'
+                    : zone.relocationTier === 'short_term'
+                    ? 'bg-amber-100 text-amber-800 border-amber-300'
+                    : 'bg-blue-100 text-blue-800 border-blue-300'
+                }`}>
+                  {zone.relocationTier === 'immediate' ? '🚨 Immediate (<30D)' : zone.relocationTier === 'short_term' ? '⚡ Short-Term (1-6M)' : '📋 Medium-Term (6-24M)'}
+                </span>
+              )}
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-1.5 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors text-gray-600"
           >
-            <XMarkIcon className="w-6 h-6 text-gray-600" />
+            <XMarkIcon className="w-5 h-5" />
           </button>
         </div>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* Red Zone Status Card if declared */}
+        {zone.redZoneStatus?.isRedZone && (
+          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 space-y-2">
+            <div className="flex items-center gap-2 text-red-800 font-bold text-sm">
+              <ExclamationTriangleIcon className="w-5 h-5 text-red-600 flex-shrink-0" />
+              <span>OFFICIAL RED ZONE DESIGNATION</span>
+            </div>
+            <p className="text-xs text-red-700 leading-relaxed">
+              Area formally classified as <strong>unfit for permanent human settlement</strong> under Section 34 of the Disaster Management Act, 2005.
+            </p>
+            {zone.redZoneStatus.gazetteRef && (
+              <div className="text-[11px] font-mono text-red-900 bg-red-100/70 px-2 py-1 rounded">
+                Gazette Ref: {zone.redZoneStatus.gazetteRef} (Declared: {zone.redZoneStatus.declaredDate})
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Hazard Info */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">
-            Hazard Information
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            Multi-Hazard Threat Profile
           </h3>
-          <div className="bg-muted p-4 rounded-lg border border-border">
-            <p className="text-sm font-semibold text-foreground capitalize mb-2">
-              {zone.hazardType.replace(/_/g, ' ')} Risk
+          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-sm font-bold text-slate-900 capitalize">
+                {zone.hazardType.replace(/_/g, ' ')} Threat
+              </p>
+              <span className="text-xs font-semibold text-accent uppercase">
+                {zone.hazardType}
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {hazardDescriptions[zone.hazardType] || 'Severe environmental hazard threat'}
             </p>
-            <p className="text-sm text-gray-600">{hazardDescriptions[zone.hazardType]}</p>
           </div>
         </div>
 
-        {/* Risk Score */}
+        {/* THREE-PILLAR EVIDENCE MODEL */}
+        {zone.hazardIntensity && zone.populationVulnerability && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              Three-Pillar Evidence Integration
+            </h3>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="bg-orange-50 border border-orange-200 p-2.5 rounded-lg">
+                <p className="text-[10px] font-semibold text-orange-700 uppercase">Hazard Intensity</p>
+                <p className="text-lg font-extrabold text-orange-900 mt-0.5">{zone.hazardIntensity.score}<span className="text-xs font-normal">/100</span></p>
+                <p className="text-[10px] text-orange-800 line-clamp-1 mt-1 font-mono">{zone.hazardIntensity.value} {zone.hazardIntensity.unit}</p>
+              </div>
+
+              <div className="bg-rose-50 border border-rose-200 p-2.5 rounded-lg">
+                <p className="text-[10px] font-semibold text-rose-700 uppercase">Vulnerability SVI</p>
+                <p className="text-lg font-extrabold text-rose-900 mt-0.5">{zone.populationVulnerability.sviScore}<span className="text-xs font-normal">/100</span></p>
+                <p className="text-[10px] text-rose-800 line-clamp-1 mt-1 font-mono">{zone.populationVulnerability.kutchaHousingPercent}% Kutcha</p>
+              </div>
+
+              <div className="bg-purple-50 border border-purple-200 p-2.5 rounded-lg">
+                <p className="text-[10px] font-semibold text-purple-700 uppercase">Disaster History</p>
+                <p className="text-lg font-extrabold text-purple-900 mt-0.5">{zone.disasterHistory.recurrenceCount}x<span className="text-xs font-normal"> Recurr</span></p>
+                <p className="text-[10px] text-purple-800 line-clamp-1 mt-1 font-mono">1 in {zone.disasterHistory.returnPeriodYears}y Return</p>
+              </div>
+            </div>
+            {zone.disasterHistory.pastEvents?.length > 0 && (
+              <div className="mt-2 text-[11px] text-slate-500 bg-slate-50 p-2 rounded border border-slate-200">
+                <strong>Historical Disaster Benchmarks:</strong> {zone.disasterHistory.pastEvents.join(' • ')}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Urgency & Reason */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
             Urgency & Assessment
           </h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-100 rounded-lg">
-              <span className="text-sm font-medium text-gray-700">Urgency Score</span>
-              <span className="text-2xl font-bold text-risk-high">{zone.urgencyScore}/100</span>
+          <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs font-bold text-yellow-800 uppercase">Urgency Score</span>
+              <span className="text-lg font-black text-risk-high">{zone.urgencyScore}/100</span>
             </div>
-            <div className="text-sm text-gray-600 p-3 bg-muted rounded-lg">
-              <p className="font-medium mb-1 text-foreground">Reason for Urgency:</p>
-              <p>{zone.reason}</p>
-            </div>
+            <p className="text-xs text-gray-700 leading-relaxed">{zone.reason}</p>
           </div>
         </div>
 

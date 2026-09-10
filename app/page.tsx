@@ -19,6 +19,7 @@ import {
   BellAlertIcon,
   ArrowRightIcon,
   ShieldCheckIcon,
+  ClockIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useRequireAuth } from '@/lib/context/AuthContext';
@@ -266,6 +267,109 @@ export default function Dashboard() {
                   <span className="text-[10px] text-gray-500">42-Day early lead test</span>
                 </div>
               </button>
+            </div>
+          </div>
+
+          {/* 🏛️ STATE DISASTER MANAGEMENT AUTHORITY (SDMA) PROACTIVE GOVERNANCE HUB */}
+          <div className="bg-white rounded-2xl p-6 md:p-8 border border-border shadow-card mb-12">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-border">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                    Proactive Planning Paradigm • Section 34 DM Act
+                  </span>
+                  <span className="text-xs font-medium text-gray-500">
+                    National Multi-Hazard Initiative
+                  </span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                  State DMA Proactive Decision Support & Red Zone Register
+                </h2>
+                <p className="text-gray-600 text-sm max-w-3xl mt-2 leading-relaxed">
+                  Moving from <strong className="text-gray-900">reactive post-disaster response</strong> to <strong className="text-gray-900">pre-emptive evidence-based relocation</strong>. Dynamically updates multi-hazard Red Zones unsuitable for permanent human settlement, evaluates carrying capacity of safer alternative sites, and ranks habitations for <em>Immediate</em>, <em>Short-Term</em>, and <em>Medium-Term</em> planned rehabilitation.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  href="/relocation"
+                  className="px-4 py-2.5 bg-accent hover:bg-blue-700 text-white font-medium text-sm rounded-lg shadow-soft transition-colors flex items-center gap-2"
+                >
+                  <ArrowPathIcon className="w-4 h-4" />
+                  3-Tier Relocation Horizons →
+                </Link>
+                <Link
+                  href="/map"
+                  className="px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 font-medium text-sm rounded-lg border border-gray-300 shadow-soft transition-colors flex items-center gap-2"
+                >
+                  <MapPinIcon className="w-4 h-4 text-emerald-600" />
+                  GIS Red Zone Overlay
+                </Link>
+              </div>
+            </div>
+
+            {/* Proactive vs. Reactive Comparative Impact Metric */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+              <div className="bg-amber-50/70 p-4 rounded-xl border border-amber-200">
+                <span className="text-xs uppercase font-bold text-amber-800">Target Hazards Monitored</span>
+                <p className="text-2xl font-bold text-gray-900 mt-1">4 Recurring Pillars</p>
+                <p className="text-xs text-gray-600 mt-0.5">Landslide • Flood • Coastal Erosion • Cloudburst</p>
+              </div>
+
+              <div className="bg-red-50/70 p-4 rounded-xl border border-red-200">
+                <span className="text-xs uppercase font-bold text-red-800">Non-Habitable Red Zones</span>
+                <p className="text-2xl font-bold text-red-700 mt-1">
+                  {hazardZonesData.filter((z) => z.redZoneStatus?.isRedZone).length} Habitations
+                </p>
+                <p className="text-xs text-gray-600 mt-0.5">Officially gazetted under Section 34</p>
+              </div>
+
+              <div className="bg-emerald-50/70 p-4 rounded-xl border border-emerald-200">
+                <span className="text-xs uppercase font-bold text-emerald-800">Safe Reception Headroom</span>
+                <p className="text-2xl font-bold text-emerald-700 mt-1">
+                  77,000 Persons ECC
+                </p>
+                <p className="text-xs text-gray-600 mt-0.5">TOPSIS-audited alternative sites</p>
+              </div>
+
+              <div className="bg-blue-50/70 p-4 rounded-xl border border-blue-200">
+                <span className="text-xs uppercase font-bold text-blue-800">Proactive Economic Benefit</span>
+                <p className="text-2xl font-bold text-blue-700 mt-1">4.2x ROI Efficiency</p>
+                <p className="text-xs text-gray-600 mt-0.5">Planned resettlement vs relief cycle</p>
+              </div>
+            </div>
+
+            {/* Three-Pillar Evidence Architecture Quick Display */}
+            <div className="mt-6 pt-6 border-t border-border grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <span className="text-xs font-bold text-amber-800 uppercase flex items-center gap-1.5">
+                  <ExclamationTriangleIcon className="w-4 h-4 text-amber-600" />
+                  1. Hazard Intensity Integration
+                </span>
+                <p className="text-xs text-gray-600 mt-1.5 leading-relaxed">
+                  Direct InSAR mm/yr displacement, cumec river runoff, mm/hr cloudburst rates, and shoreline retreat velocities.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <span className="text-xs font-bold text-red-800 uppercase flex items-center gap-1.5">
+                  <UsersIcon className="w-4 h-4 text-red-600" />
+                  2. Population Vulnerability
+                </span>
+                <p className="text-xs text-gray-600 mt-1.5 leading-relaxed">
+                  Social Vulnerability Index (SVI), % kutcha precarious housing, demographic dependency, and healthcare latency.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <span className="text-xs font-bold text-purple-800 uppercase flex items-center gap-1.5">
+                  <ClockIcon className="w-4 h-4 text-purple-600" />
+                  3. Historical Recurrence
+                </span>
+                <p className="text-xs text-gray-600 mt-1.5 leading-relaxed">
+                  Multi-decadal return period verification, past breach records, and cumulative displacement telemetry.
+                </p>
+              </div>
             </div>
           </div>
 

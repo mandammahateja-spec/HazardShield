@@ -19,16 +19,19 @@ export interface ZoneDynamicRisk {
   evacuationUrgent: boolean;
 }
 
-// Default environmental calibration parameters per zone
+// Environmental calibration parameters per zone
 export const ZONE_DRS_CALIBRATION: Record<string, ZoneDrsParameters> = {
-  zone_001: { mhi: 78, rThresh: 85, alpha: 1.15, soilSaturation: 0.72 }, // Coastal Settlement Alpha (Flood)
-  zone_002: { mhi: 74, rThresh: 140, alpha: 0.85, soilSaturation: 0.45 }, // Highland Industrial (Earthquake)
-  zone_003: { mhi: 55, rThresh: 95, alpha: 1.30, soilSaturation: 0.68 }, // Valley Settlement Beta (Landslide)
-  zone_004: { mhi: 82, rThresh: 75, alpha: 1.25, soilSaturation: 0.80 }, // Mangrove Delta (Cyclone/Storm Surge)
-  zone_005: { mhi: 42, rThresh: 110, alpha: 1.05, soilSaturation: 0.50 }, // Urban Extension (Flood)
-  zone_006: { mhi: 26, rThresh: 180, alpha: 0.70, soilSaturation: 0.30 }, // Mountain Village Cluster (Seismic)
-  zone_007: { mhi: 30, rThresh: 160, alpha: 0.75, soilSaturation: 0.35 }, // Tech Park Area (Flood Safe)
-  zone_008: { mhi: 48, rThresh: 90, alpha: 1.20, soilSaturation: 0.62 }, // Riverside Community (Landslide)
+  zone_wayanad: { mhi: 92, rThresh: 80, alpha: 1.40, soilSaturation: 0.88 }, // Landslide
+  zone_yamuna: { mhi: 88, rThresh: 75, alpha: 1.25, soilSaturation: 0.80 }, // Flood
+  zone_chellanam: { mhi: 90, rThresh: 70, alpha: 1.30, soilSaturation: 0.85 }, // Coastal Erosion
+  zone_dharamshala: { mhi: 89, rThresh: 65, alpha: 1.45, soilSaturation: 0.75 }, // Cloudburst
+  zone_joshimath: { mhi: 88, rThresh: 90, alpha: 1.20, soilSaturation: 0.70 }, // Landslide / Subsidence
+  zone_majuli: { mhi: 74, rThresh: 85, alpha: 1.15, soilSaturation: 0.75 }, // Flood
+  zone_kedarnath: { mhi: 72, rThresh: 60, alpha: 1.35, soilSaturation: 0.65 }, // Cloudburst
+  zone_pentha: { mhi: 70, rThresh: 80, alpha: 1.10, soilSaturation: 0.68 }, // Coastal Erosion
+  zone_poothkhurd: { mhi: 54, rThresh: 100, alpha: 0.95, soilSaturation: 0.50 }, // Landslide / Marginal
+  zone_dwarka_safe: { mhi: 16, rThresh: 150, alpha: 0.50, soilSaturation: 0.25 }, // Safe Reception
+  zone_meppadi_safe: { mhi: 14, rThresh: 180, alpha: 0.45, soilSaturation: 0.20 }, // Safe Reception
 };
 
 /**
@@ -39,25 +42,36 @@ export function calculateZoneDrs(
   zone: HazardZone,
   rainfallMm: number
 ): ZoneDynamicRisk {
+  // Compute baseline MHI from 3-pillar evidence if available
+  let computedMhi = 50;
+  if (zone.hazardIntensity && zone.populationVulnerability && zone.disasterHistory) {
+    const dScore = Math.min(100, zone.disasterHistory.recurrenceCount * 12);
+    computedMhi = (0.40 * zone.hazardIntensity.score) + (0.35 * zone.populationVulnerability.sviScore) + (0.25 * dScore);
+  } else if (zone.urgencyScore > 0) {
+    computedMhi = zone.urgencyScore * 0.9;
+  }
+
   const cal = ZONE_DRS_CALIBRATION[zone.id] || {
-    mhi: zone.urgencyScore > 0 ? zone.urgencyScore * 0.85 : 50,
-    rThresh: 100,
-    alpha: 1.0,
-    soilSaturation: 0.5,
+    mhi: computedMhi,
+    rThresh: 85,
+    alpha: 1.1,
+    soilSaturation: 0.6,
   };
+
+  const effectiveMhi = cal.mhi || computedMhi;
 
   let drs: number;
 
   if (rainfallMm <= 0) {
-    drs = cal.mhi;
+    drs = effectiveMhi;
   } else if (rainfallMm <= cal.rThresh) {
     // Sub-threshold rainfall: mild proportional moisture accumulation
     const subFactor = (rainfallMm / cal.rThresh) * 0.12 * cal.alpha;
-    drs = cal.mhi * (1 + subFactor);
+    drs = effectiveMhi * (1 + subFactor);
   } else {
     // Formula: DRS = MHI * [1 + alpha * ((R_cum - R_thresh) / R_thresh)]
     const surgeRatio = (rainfallMm - cal.rThresh) / cal.rThresh;
-    drs = cal.mhi * (1 + cal.alpha * surgeRatio);
+    drs = effectiveMhi * (1 + cal.alpha * surgeRatio);
   }
 
   // Bound score between 5 and 100

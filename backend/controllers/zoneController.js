@@ -13,6 +13,8 @@ const getZones = async (req, res, next) => {
     const filter = {};
     if (hazardType) filter.hazardType = hazardType;
     if (riskLevel) filter.riskLevel = riskLevel;
+    if (req.query.redZone === 'true') filter['redZoneStatus.isRedZone'] = true;
+    if (req.query.relocationTier) filter.relocationTier = req.query.relocationTier;
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 

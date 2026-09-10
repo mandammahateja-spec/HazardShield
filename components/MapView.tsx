@@ -1,6 +1,6 @@
 'use client';
 
-import { MapContainer, TileLayer, CircleMarker, Popup, Polyline, Tooltip } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup, Polyline, Tooltip, Polygon } from 'react-leaflet';
 import { LatLngExpression } from 'leaflet';
 import { HazardZone } from '@/data/hazardZones';
 import 'leaflet/dist/leaflet.css';
@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { calculateAllZonesDrs } from '@/lib/engine/drsCalculator';
 import { calculateAllZonesOci, DEFAULT_INFRASTRUCTURE_PARAMS } from '@/lib/engine/ociEngine';
 import { EVACUATION_GRAPHS } from '@/lib/engine/evacuationFlow';
+import { CANDIDATE_RESETTLEMENT_SITES } from '@/lib/engine/topsisEngine';
 
 interface MapViewProps {
   zones: HazardZone[];
@@ -15,6 +16,8 @@ interface MapViewProps {
   selectedZone?: HazardZone | null;
   simulatedRainfallMm?: number;
   showEvacuationRoutes?: boolean;
+  showRedZonePolygons?: boolean;
+  showSafeResettlementSites?: boolean;
   onOpenBottlenecks?: (zone: HazardZone) => void;
   onOpenResettlement?: (zone: HazardZone) => void;
 }
@@ -24,6 +27,8 @@ export default function MapView({
   selectedZone,
   simulatedRainfallMm = 0,
   showEvacuationRoutes = true,
+  showRedZonePolygons = true,
+  showSafeResettlementSites = true,
   onOpenBottlenecks,
   onOpenResettlement,
 }: MapViewProps) {
@@ -45,7 +50,8 @@ export default function MapView({
     );
   }
 
-  const center: LatLngExpression = [19.0760, 72.8777];
+  // Centered on India to view all hazard zones across states
+  const center: LatLngExpression = [22.5000, 80.0000];
 
   return (
     <div className="w-full h-full rounded-xl overflow-hidden border border-border shadow-card relative isolate z-0">
@@ -57,11 +63,58 @@ export default function MapView({
         </div>
       )}
 
-      <MapContainer center={center} zoom={11} className="w-full h-full">
+      <MapContainer center={center} zoom={5} className="w-full h-full">
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+
+        {/* Official Red Zone Non-Habitable Polygons */}
+        {showRedZonePolygons && zones.filter(z => z.polygon && z.redZoneStatus?.isRedZone).map((zone) => (
+          <Polygon
+            key={`poly-${zone.id}`}
+            positions={zone.polygon!}
+            pathOptions={{
+              color: '#B91C1C',
+              fillColor: '#EF4444',
+              fillOpacity: 0.25,
+              weight: 2,
+              dashArray: '4, 4',
+            }}
+          >
+            <Tooltip sticky>
+              <div className="text-xs">
+                <span className="font-bold text-red-700 uppercase">🚨 Non-Habitable Red Zone</span>
+                <p className="font-semibold text-gray-900">{zone.name}</p>
+                <p className="text-[10px] text-gray-500">{zone.redZoneStatus?.prohibitionClause || 'Prohibited settlement area'}</p>
+              </div>
+            </Tooltip>
+          </Polygon>
+        ))}
+
+        {/* Safer Alternative Resettlement Candidate Sites (Green Shield Markers) */}
+        {showSafeResettlementSites && Object.entries(CANDIDATE_RESETTLEMENT_SITES).flatMap(([_, sites]) => sites).map((site) => (
+          <CircleMarker
+            key={`safe-${site.id}`}
+            center={site.coordinates}
+            radius={7}
+            pathOptions={{
+              fillColor: '#059669',
+              color: '#064E3B',
+              weight: 2,
+              fillOpacity: 0.9,
+            }}
+          >
+            <Tooltip sticky>
+              <div className="text-xs">
+                <span className="font-bold text-emerald-700 uppercase">🛡️ Safe Reception Site</span>
+                <p className="font-bold text-gray-900">{site.name}</p>
+                <p className="text-[10px] text-gray-600">Available Headroom: <strong>{site.availableCapacity.toLocaleString()} people</strong></p>
+                <p className="text-[10px] text-gray-600">Slope: {site.slopeDegrees}° • Water: {site.waterLpcdCapacity} LPCD</p>
+              </div>
+            </Tooltip>
+          </CircleMarker>
+        ))}
 
         {/* Evacuation Route Polylines & Bottleneck Highlights */}
         {showEvacuationRoutes && Object.values(EVACUATION_GRAPHS).map((graph) => (

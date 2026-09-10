@@ -7,10 +7,18 @@ const RelocationPlan = require('../models/RelocationPlan');
  */
 const getRelocationPriority = async (req, res, next) => {
   try {
-    const plans = await RelocationPlan.find()
+    const filter = {};
+    if (req.query.tier) {
+      filter.relocationTier = req.query.tier;
+    }
+    if (req.query.status) {
+      filter.status = req.query.status;
+    }
+
+    const plans = await RelocationPlan.find(filter)
       .populate({
         path: 'zoneId',
-        select: 'zoneName hazardType riskLevel riskScore population carryingCapacity overcapacityIndex',
+        select: 'zoneName hazardType riskLevel riskScore drsScore mhiScore population carryingCapacity eccCapacity overcapacityIndex limitingFactor hazardIntensity populationVulnerability disasterHistory redZoneStatus relocationTier rainfallMm',
       })
       .populate({
         path: 'approvedBy',

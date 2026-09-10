@@ -117,6 +117,16 @@ export default function ZonesTable({ zones, onRowClick }: ZonesTableProps) {
                   }`}
                 >
                   <td className="py-4 px-6">
+                    <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                      <span className="text-[10px] font-mono uppercase bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded">
+                        {zone.state || 'India'}
+                      </span>
+                      {zone.redZoneStatus?.isRedZone && (
+                        <span className="text-[10px] font-black uppercase bg-red-100 text-red-700 border border-red-200 px-1.5 py-0.5 rounded">
+                          Red Zone
+                        </span>
+                      )}
+                    </div>
                     <p className="font-semibold text-foreground">{zone.name}</p>
                   </td>
                   <td className="py-4 px-6">

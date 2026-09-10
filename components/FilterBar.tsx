@@ -14,17 +14,19 @@ export default function FilterBar({ onHazardTypeChange, onRiskLevelChange }: Fil
 
   const hazardTypes = [
     { value: 'all', label: 'All Hazards' },
-    { value: 'earthquake', label: 'Earthquake' },
-    { value: 'flood', label: 'Flood' },
     { value: 'landslide', label: 'Landslide' },
+    { value: 'flood', label: 'Flood' },
+    { value: 'coastal_erosion', label: 'Coastal Erosion' },
+    { value: 'cloudburst', label: 'Cloudburst' },
     { value: 'cyclone', label: 'Cyclone' },
+    { value: 'earthquake', label: 'Earthquake' },
   ];
 
   const riskLevels = [
-    { value: 'all', label: 'All Levels' },
-    { value: 'high', label: 'High Risk' },
-    { value: 'medium', label: 'Medium Risk' },
-    { value: 'low', label: 'Low Risk' },
+    { value: 'all', label: 'All Risk Levels' },
+    { value: 'high', label: 'Red Zone (High Risk)' },
+    { value: 'medium', label: 'Yellow Zone (Medium)' },
+    { value: 'low', label: 'Green Zone (Safe)' },
   ];
 
   const handleHazardChange = (value: string) => {

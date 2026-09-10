@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
-import { hazardZonesData, mockReports } from '@/data/hazardZones';
+import { hazardZonesData, mockReports, MockReport } from '@/data/hazardZones';
 import { DocumentArrowDownIcon, CalendarIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import DdmaReportModal from '@/components/simulation/DdmaReportModal';
@@ -249,7 +249,7 @@ export default function ReportsPage() {
               <div className="bg-white rounded-xl border border-border p-6 shadow-card">
                 <h3 className="text-lg font-semibold text-foreground mb-4">Previous Reports</h3>
                 <div className="space-y-3">
-                  {mockReports.map((report) => (
+                  {mockReports.map((report: MockReport) => (
                     <div key={report.id} className="p-4 bg-muted rounded-lg border border-border hover:border-gray-300 transition-colors cursor-pointer">
                       <div className="flex items-start gap-3">
                         <DocumentArrowDownIcon className="w-5 h-5 text-accent flex-shrink-0 mt-1" />

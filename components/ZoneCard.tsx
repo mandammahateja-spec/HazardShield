@@ -20,9 +20,19 @@ export default function ZoneCard({ zone, onClick, showActions = true }: ZoneCard
       className="bg-white border border-border rounded-xl p-5 hover:shadow-hover transition-all duration-300 hover:border-gray-300 cursor-pointer group"
     >
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-foreground group-hover:text-risk-high transition-colors">
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex-1 pr-2">
+          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+            <span className="text-[10px] font-mono uppercase bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
+              {zone.state || 'India'}
+            </span>
+            {zone.redZoneStatus?.isRedZone && (
+              <span className="text-[10px] font-bold uppercase bg-red-100 text-red-700 border border-red-200 px-1.5 py-0.5 rounded">
+                Red Zone (Non-Habitable)
+              </span>
+            )}
+          </div>
+          <h3 className="text-base font-bold text-foreground group-hover:text-risk-high transition-colors line-clamp-1">
             {zone.name}
           </h3>
           <p className="text-xs text-gray-500 capitalize">{zone.hazardType.replace(/_/g, ' ')}</p>

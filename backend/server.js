@@ -175,143 +175,232 @@ const autoSeed = async () => {
         rainfallMm: 185.4,
         hasVerifiedHazard: true,
         authorityJurisdiction: 'DistrictAdmin',
+        hazardIntensity: { value: 88, unit: 'm3/sec river discharge', score: 90 },
+        populationVulnerability: { sviScore: 84, kutchaHousingPercent: 68, vulnerablePop: 21760 },
+        disasterHistory: { recurrenceCount: 6, returnPeriodYears: 1, pastEvents: ['2023 Yamuna Peak Spill', '2019 Monsoon Breach'], cumulativeDisplaced: 28000 },
+        redZoneStatus: { isRedZone: true, declaredDate: new Date('2024-05-10'), gazetteRef: 'DDMA/FLD/2024/09', unsuitableForHabitation: true },
+        relocationTier: 'immediate',
         riskHistory: [{ score: 85, date: new Date('2024-06-01') },{ score: 88, date: new Date('2024-07-01') },{ score: 90, date: new Date('2024-08-01') },{ score: 92, date: new Date('2024-09-01') }]
       },
       {
-        zoneName: 'Rohini Sector 15',
-        coordinates: { type: 'Polygon', coordinates: [[[77.060,28.735],[77.076,28.735],[77.076,28.746],[77.060,28.746],[77.060,28.735]]] },
-        hazardType: 'flood',
-        riskScore: 87,
-        mhiScore: 82,
-        drsScore: 87,
+        zoneName: 'Chooralmala & Meppadi Habitation',
+        coordinates: { type: 'Polygon', coordinates: [[[76.120,11.530],[76.140,11.530],[76.140,11.548],[76.120,11.548],[76.120,11.530]]] },
+        hazardType: 'landslide',
+        riskScore: 96,
+        mhiScore: 92,
+        drsScore: 96,
         riskLevel: 'red',
-        population: 45000,
-        carryingCapacity: 35000,
-        eccCapacity: 34000,
-        limitingFactor: 'Stormwater Runoff',
-        rainfallMm: 142.0,
+        population: 14800,
+        carryingCapacity: 6500,
+        eccCapacity: 6200,
+        limitingFactor: 'Debris Flow Velocity & Slope Failure',
+        rainfallMm: 372.0,
         hasVerifiedHazard: true,
-        authorityJurisdiction: 'DistrictAdmin',
-        riskHistory: [{ score: 78, date: new Date('2024-06-01') },{ score: 82, date: new Date('2024-07-01') },{ score: 85, date: new Date('2024-08-01') },{ score: 87, date: new Date('2024-09-01') }]
+        authorityJurisdiction: 'StateDMA',
+        hazardIntensity: { value: 372, unit: 'mm/48hr rainfall', score: 98 },
+        populationVulnerability: { sviScore: 82, kutchaHousingPercent: 60, vulnerablePop: 8880 },
+        disasterHistory: { recurrenceCount: 4, returnPeriodYears: 2, pastEvents: ['2024 Chooralmala Debris Surge', '2020 Puthumala Landslide'], cumulativeDisplaced: 12500 },
+        redZoneStatus: { isRedZone: true, declaredDate: new Date('2024-07-30'), gazetteRef: 'KSDMA/LS/2024/WZ-01', unsuitableForHabitation: true },
+        relocationTier: 'immediate',
+        riskHistory: [{ score: 86, date: new Date('2024-06-01') },{ score: 90, date: new Date('2024-07-01') },{ score: 94, date: new Date('2024-08-01') },{ score: 96, date: new Date('2024-09-01') }]
       },
       {
-        zoneName: 'Narela Industrial Belt',
-        coordinates: { type: 'Polygon', coordinates: [[[77.090,28.840],[77.105,28.840],[77.105,28.852],[77.090,28.852],[77.090,28.840]]] },
-        hazardType: 'cyclone',
-        riskScore: 78,
-        mhiScore: 74,
-        drsScore: 78,
+        zoneName: 'Joshimath Subsidence Ward 4',
+        coordinates: { type: 'Polygon', coordinates: [[[79.550,30.550],[79.570,30.550],[79.570,30.565],[79.550,30.565],[79.550,30.550]]] },
+        hazardType: 'landslide',
+        riskScore: 91,
+        mhiScore: 89,
+        drsScore: 91,
         riskLevel: 'red',
-        population: 52000,
-        carryingCapacity: 40000,
-        eccCapacity: 39500,
-        limitingFactor: 'Industrial Evacuation Corridors',
-        rainfallMm: 110.0,
+        population: 9400,
+        carryingCapacity: 4500,
+        eccCapacity: 4300,
+        limitingFactor: 'Bedrock Fissures & Bearing Failure',
+        rainfallMm: 98.0,
+        hasVerifiedHazard: true,
+        authorityJurisdiction: 'StateDMA',
+        hazardIntensity: { value: 55, unit: 'mm/yr InSAR subsidence', score: 94 },
+        populationVulnerability: { sviScore: 78, kutchaHousingPercent: 50, vulnerablePop: 4700 },
+        disasterHistory: { recurrenceCount: 5, returnPeriodYears: 1, pastEvents: ['2023 Aquifer Puncture Cracks', '2021 Dhauliganga Flash Surge'], cumulativeDisplaced: 5200 },
+        redZoneStatus: { isRedZone: true, declaredDate: new Date('2023-01-15'), gazetteRef: 'USDMA/SUB/2023/02', unsuitableForHabitation: true },
+        relocationTier: 'immediate',
+        riskHistory: [{ score: 82, date: new Date('2024-06-01') },{ score: 85, date: new Date('2024-07-01') },{ score: 88, date: new Date('2024-08-01') },{ score: 91, date: new Date('2024-09-01') }]
+      },
+      {
+        zoneName: 'Chellanam Coastal Hamlet',
+        coordinates: { type: 'Polygon', coordinates: [[[76.265,9.800],[76.280,9.800],[76.280,9.815],[76.265,9.815],[76.265,9.800]]] },
+        hazardType: 'coastal_erosion',
+        riskScore: 94,
+        mhiScore: 90,
+        drsScore: 94,
+        riskLevel: 'red',
+        population: 12000,
+        carryingCapacity: 6000,
+        eccCapacity: 5800,
+        limitingFactor: 'Sea-Wall Inundation & Wave Surge',
+        rainfallMm: 210.0,
+        hasVerifiedHazard: true,
+        authorityJurisdiction: 'StateDMA',
+        hazardIntensity: { value: 4.2, unit: 'm/yr shoreline retreat', score: 92 },
+        populationVulnerability: { sviScore: 80, kutchaHousingPercent: 55, vulnerablePop: 6600 },
+        disasterHistory: { recurrenceCount: 8, returnPeriodYears: 1, pastEvents: ['2023 Cyclone Biparjoy Swell', '2021 Cyclone Tauktae Surge'], cumulativeDisplaced: 11000 },
+        redZoneStatus: { isRedZone: true, declaredDate: new Date('2024-04-18'), gazetteRef: 'KSDMA/COAST/2024/07', unsuitableForHabitation: true },
+        relocationTier: 'immediate',
+        riskHistory: [{ score: 85, date: new Date('2024-06-01') },{ score: 88, date: new Date('2024-07-01') },{ score: 91, date: new Date('2024-08-01') },{ score: 94, date: new Date('2024-09-01') }]
+      },
+      {
+        zoneName: 'Dharamshala Kangra Ravine Sector',
+        coordinates: { type: 'Polygon', coordinates: [[[76.310,32.210],[76.330,32.210],[76.330,32.225],[76.310,32.225],[76.310,32.210]]] },
+        hazardType: 'cloudburst',
+        riskScore: 93,
+        mhiScore: 88,
+        drsScore: 93,
+        riskLevel: 'red',
+        population: 7200,
+        carryingCapacity: 3800,
+        eccCapacity: 3600,
+        limitingFactor: 'Torrents & Flash Gorge Chokepoint',
+        rainfallMm: 245.0,
+        hasVerifiedHazard: true,
+        authorityJurisdiction: 'StateDMA',
+        hazardIntensity: { value: 112, unit: 'mm/hr precipitation', score: 95 },
+        populationVulnerability: { sviScore: 72, kutchaHousingPercent: 42, vulnerablePop: 3024 },
+        disasterHistory: { recurrenceCount: 4, returnPeriodYears: 2, pastEvents: ['2023 Beas Basin Cloudburst', '2021 Bhagsunag Flash Torrent'], cumulativeDisplaced: 6200 },
+        redZoneStatus: { isRedZone: true, declaredDate: new Date('2024-08-05'), gazetteRef: 'HPSDMA/CB/2024/05', unsuitableForHabitation: true },
+        relocationTier: 'immediate',
+        riskHistory: [{ score: 80, date: new Date('2024-06-01') },{ score: 84, date: new Date('2024-07-01') },{ score: 89, date: new Date('2024-08-01') },{ score: 93, date: new Date('2024-09-01') }]
+      },
+      {
+        zoneName: 'Majuli Island Floodplain',
+        coordinates: { type: 'Polygon', coordinates: [[[94.150,26.920],[94.180,26.920],[94.180,26.945],[94.150,26.945],[94.150,26.920]]] },
+        hazardType: 'flood',
+        riskScore: 76,
+        mhiScore: 74,
+        drsScore: 76,
+        riskLevel: 'red',
+        population: 21000,
+        carryingCapacity: 14000,
+        eccCapacity: 13500,
+        limitingFactor: 'Brahmaputra Bank Siltation Deficit',
+        rainfallMm: 165.0,
+        hasVerifiedHazard: false,
+        authorityJurisdiction: 'StateDMA',
+        hazardIntensity: { value: 24000, unit: 'cumec runoff', score: 86 },
+        populationVulnerability: { sviScore: 85, kutchaHousingPercent: 75, vulnerablePop: 15750 },
+        disasterHistory: { recurrenceCount: 12, returnPeriodYears: 1, pastEvents: ['2022 Assam Flood Inundation', '2020 Severe Embankment Cut'], cumulativeDisplaced: 35000 },
+        redZoneStatus: { isRedZone: true, declaredDate: new Date('2024-06-12'), gazetteRef: 'ASDMA/BRAH/2024/11', unsuitableForHabitation: true },
+        relocationTier: 'short_term',
+        riskHistory: [{ score: 68, date: new Date('2024-06-01') },{ score: 71, date: new Date('2024-07-01') },{ score: 74, date: new Date('2024-08-01') },{ score: 76, date: new Date('2024-09-01') }]
+      },
+      {
+        zoneName: 'Kedarnath Valley Tributary Habitation',
+        coordinates: { type: 'Polygon', coordinates: [[[79.055,30.725],[79.075,30.725],[79.075,30.742],[79.055,30.742],[79.055,30.725]]] },
+        hazardType: 'cloudburst',
+        riskScore: 74,
+        mhiScore: 71,
+        drsScore: 74,
+        riskLevel: 'red',
+        population: 5800,
+        carryingCapacity: 4000,
+        eccCapacity: 3800,
+        limitingFactor: 'Glacial Outflow Chokepoints',
+        rainfallMm: 140.0,
         hasVerifiedHazard: false,
         authorityJurisdiction: 'DistrictAdmin',
-        riskHistory: [{ score: 70, date: new Date('2024-06-01') },{ score: 74, date: new Date('2024-07-01') },{ score: 76, date: new Date('2024-08-01') },{ score: 78, date: new Date('2024-09-01') }]
+        hazardIntensity: { value: 98, unit: 'mm/hr cloudburst', score: 89 },
+        populationVulnerability: { sviScore: 74, kutchaHousingPercent: 48, vulnerablePop: 2784 },
+        disasterHistory: { recurrenceCount: 7, returnPeriodYears: 3, pastEvents: ['2024 Mandakini Flash Surge', '2013 Chorbari Glacial Breach'], cumulativeDisplaced: 8900 },
+        redZoneStatus: { isRedZone: true, declaredDate: new Date('2024-07-28'), gazetteRef: 'USDMA/CB/2024/08', unsuitableForHabitation: true },
+        relocationTier: 'short_term',
+        riskHistory: [{ score: 66, date: new Date('2024-06-01') },{ score: 69, date: new Date('2024-07-01') },{ score: 71, date: new Date('2024-08-01') },{ score: 74, date: new Date('2024-09-01') }]
+      },
+      {
+        zoneName: 'Pentha Beach Sea-Wall Breach Zone',
+        coordinates: { type: 'Polygon', coordinates: [[[86.840,20.520],[86.860,20.520],[86.860,20.538],[86.840,20.538],[86.840,20.520]]] },
+        hazardType: 'coastal_erosion',
+        riskScore: 72,
+        mhiScore: 68,
+        drsScore: 72,
+        riskLevel: 'red',
+        population: 11000,
+        carryingCapacity: 8000,
+        eccCapacity: 7600,
+        limitingFactor: 'Geotube Embankment Subsidence',
+        rainfallMm: 130.0,
+        hasVerifiedHazard: false,
+        authorityJurisdiction: 'DistrictAdmin',
+        hazardIntensity: { value: 3.8, unit: 'm/yr wave scouring velocity', score: 85 },
+        populationVulnerability: { sviScore: 76, kutchaHousingPercent: 62, vulnerablePop: 6820 },
+        disasterHistory: { recurrenceCount: 6, returnPeriodYears: 2, pastEvents: ['2021 Cyclone Yaas Surge', '2019 Cyclone Fani Overwash'], cumulativeDisplaced: 8500 },
+        redZoneStatus: { isRedZone: true, declaredDate: new Date('2024-05-22'), gazetteRef: 'OSDMA/EROS/2024/03', unsuitableForHabitation: true },
+        relocationTier: 'short_term',
+        riskHistory: [{ score: 64, date: new Date('2024-06-01') },{ score: 67, date: new Date('2024-07-01') },{ score: 70, date: new Date('2024-08-01') },{ score: 72, date: new Date('2024-09-01') }]
       },
       {
         zoneName: 'Pooth Khurd Village',
         coordinates: { type: 'Polygon', coordinates: [[[77.072,28.714],[77.088,28.714],[77.088,28.726],[77.072,28.726],[77.072,28.714]]] },
         hazardType: 'landslide',
-        riskScore: 75,
-        mhiScore: 72,
-        drsScore: 75,
-        riskLevel: 'red',
+        riskScore: 56,
+        mhiScore: 54,
+        drsScore: 56,
+        riskLevel: 'yellow',
         population: 24000,
-        carryingCapacity: 20000,
-        eccCapacity: 19000,
-        limitingFactor: 'Slope Stability & Subsidence',
-        rainfallMm: 95.0,
-        hasVerifiedHazard: false,
-        authorityJurisdiction: 'DistrictAdmin',
-        riskHistory: [{ score: 68, date: new Date('2024-06-01') },{ score: 71, date: new Date('2024-07-01') },{ score: 73, date: new Date('2024-08-01') },{ score: 75, date: new Date('2024-09-01') }]
-      },
-      {
-        zoneName: 'Coastal Settlement Alpha',
-        coordinates: { type: 'Polygon', coordinates: [[[72.870,19.070],[72.885,19.070],[72.885,19.082],[72.870,19.082],[72.870,19.070]]] },
-        hazardType: 'cyclone',
-        riskScore: 95,
-        mhiScore: 90,
-        drsScore: 95,
-        riskLevel: 'red',
-        population: 18000,
-        carryingCapacity: 9000,
-        eccCapacity: 8800,
-        limitingFactor: 'Storm Surge Inundation Zone',
-        rainfallMm: 260.5,
-        hasVerifiedHazard: true,
-        authorityJurisdiction: 'StateDMA',
-        riskHistory: [{ score: 88, date: new Date('2024-06-01') },{ score: 91, date: new Date('2024-07-01') },{ score: 93, date: new Date('2024-08-01') },{ score: 95, date: new Date('2024-09-01') }]
-      },
-      {
-        zoneName: 'Burari Village',
-        coordinates: { type: 'Polygon', coordinates: [[[77.193,28.746],[77.209,28.746],[77.209,28.758],[77.193,28.758],[77.193,28.746]]] },
-        hazardType: 'flood',
-        riskScore: 62,
-        mhiScore: 60,
-        drsScore: 62,
-        riskLevel: 'yellow',
-        population: 28000,
-        carryingCapacity: 30000,
-        eccCapacity: 29000,
-        limitingFactor: 'Groundwater Table Saturation',
-        rainfallMm: 72.0,
-        hasVerifiedHazard: false,
-        authorityJurisdiction: 'Municipal',
-        riskHistory: [{ score: 55, date: new Date('2024-06-01') },{ score: 58, date: new Date('2024-07-01') },{ score: 60, date: new Date('2024-08-01') },{ score: 62, date: new Date('2024-09-01') }]
-      },
-      {
-        zoneName: 'Majnu Ka Tilla',
-        coordinates: { type: 'Polygon', coordinates: [[[77.205,28.698],[77.220,28.698],[77.220,28.710],[77.205,28.710],[77.205,28.698]]] },
-        hazardType: 'landslide',
-        riskScore: 58,
-        mhiScore: 55,
-        drsScore: 58,
-        riskLevel: 'yellow',
-        population: 18000,
         carryingCapacity: 22000,
-        eccCapacity: 21500,
-        limitingFactor: 'Riverbank Soil Erosion',
+        eccCapacity: 21000,
+        limitingFactor: 'Slope Stability & Subsidence',
         rainfallMm: 65.0,
         hasVerifiedHazard: false,
-        authorityJurisdiction: 'Municipal',
-        riskHistory: [{ score: 50, date: new Date('2024-06-01') },{ score: 53, date: new Date('2024-07-01') },{ score: 56, date: new Date('2024-08-01') },{ score: 58, date: new Date('2024-09-01') }]
+        authorityJurisdiction: 'DistrictAdmin',
+        hazardIntensity: { value: 45, unit: 'slope shear index', score: 55 },
+        populationVulnerability: { sviScore: 52, kutchaHousingPercent: 35, vulnerablePop: 8400 },
+        disasterHistory: { recurrenceCount: 2, returnPeriodYears: 5, pastEvents: ['2018 Embankment Crack'], cumulativeDisplaced: 1200 },
+        redZoneStatus: { isRedZone: false, declaredDate: null, gazetteRef: '', unsuitableForHabitation: false },
+        relocationTier: 'medium_term',
+        riskHistory: [{ score: 52, date: new Date('2024-06-01') },{ score: 53, date: new Date('2024-07-01') },{ score: 55, date: new Date('2024-08-01') },{ score: 56, date: new Date('2024-09-01') }]
       },
       {
-        zoneName: 'Dwarka Sector 21',
+        zoneName: 'Dwarka Integrated Eco-Township Corridor',
         coordinates: { type: 'Polygon', coordinates: [[[77.058,28.555],[77.074,28.555],[77.074,28.567],[77.058,28.567],[77.058,28.555]]] },
         hazardType: 'flood',
-        riskScore: 18,
-        mhiScore: 18,
-        drsScore: 18,
+        riskScore: 16,
+        mhiScore: 16,
+        drsScore: 16,
         riskLevel: 'green',
         population: 8000,
-        carryingCapacity: 15000,
-        eccCapacity: 16000,
-        limitingFactor: 'None - Sustainable Safe Zone',
-        rainfallMm: 24.0,
+        carryingCapacity: 25000,
+        eccCapacity: 26000,
+        limitingFactor: 'None - Sustainable Safe Reception Site',
+        rainfallMm: 20.0,
         hasVerifiedHazard: false,
         authorityJurisdiction: 'DistrictAdmin',
-        riskHistory: [{ score: 20, date: new Date('2024-06-01') },{ score: 19, date: new Date('2024-07-01') },{ score: 18, date: new Date('2024-08-01') },{ score: 18, date: new Date('2024-09-01') }]
+        hazardIntensity: { value: 12, unit: 'discharge index', score: 15 },
+        populationVulnerability: { sviScore: 25, kutchaHousingPercent: 8, vulnerablePop: 640 },
+        disasterHistory: { recurrenceCount: 0, returnPeriodYears: 50, pastEvents: [], cumulativeDisplaced: 0 },
+        redZoneStatus: { isRedZone: false, declaredDate: null, gazetteRef: '', unsuitableForHabitation: false },
+        relocationTier: 'monitoring',
+        riskHistory: [{ score: 18, date: new Date('2024-06-01') },{ score: 17, date: new Date('2024-07-01') },{ score: 16, date: new Date('2024-08-01') },{ score: 16, date: new Date('2024-09-01') }]
       },
       {
-        zoneName: 'Greater Noida Tech Corridor',
-        coordinates: { type: 'Polygon', coordinates: [[[77.490,28.470],[77.506,28.470],[77.506,28.482],[77.490,28.482],[77.490,28.470]]] },
-        hazardType: 'earthquake',
-        riskScore: 15,
-        mhiScore: 15,
-        drsScore: 15,
+        zoneName: 'Meppadi Upland Resettlement Ridge',
+        coordinates: { type: 'Polygon', coordinates: [[[76.160,11.560],[76.180,11.560],[76.180,11.575],[76.160,11.575],[76.160,11.560]]] },
+        hazardType: 'landslide',
+        riskScore: 14,
+        mhiScore: 14,
+        drsScore: 14,
         riskLevel: 'green',
-        population: 10000,
-        carryingCapacity: 30000,
-        eccCapacity: 32000,
-        limitingFactor: 'None - Sustainable Safe Zone',
-        rainfallMm: 15.0,
+        population: 3200,
+        carryingCapacity: 14000,
+        eccCapacity: 15000,
+        limitingFactor: 'None - Basalt Bedrock Safe Reception Site',
+        rainfallMm: 80.0,
         hasVerifiedHazard: false,
         authorityJurisdiction: 'StateDMA',
-        riskHistory: [{ score: 18, date: new Date('2024-06-01') },{ score: 17, date: new Date('2024-07-01') },{ score: 16, date: new Date('2024-08-01') },{ score: 15, date: new Date('2024-09-01') }]
+        hazardIntensity: { value: 10, unit: 'stability index', score: 12 },
+        populationVulnerability: { sviScore: 20, kutchaHousingPercent: 5, vulnerablePop: 160 },
+        disasterHistory: { recurrenceCount: 0, returnPeriodYears: 50, pastEvents: [], cumulativeDisplaced: 0 },
+        redZoneStatus: { isRedZone: false, declaredDate: null, gazetteRef: '', unsuitableForHabitation: false },
+        relocationTier: 'monitoring',
+        riskHistory: [{ score: 15, date: new Date('2024-06-01') },{ score: 15, date: new Date('2024-07-01') },{ score: 14, date: new Date('2024-08-01') },{ score: 14, date: new Date('2024-09-01') }]
       },
     ];
 
@@ -320,32 +409,131 @@ const autoSeed = async () => {
     // Assign the citizen user to Yamuna Bank Colony
     await User.updateOne({ email: 'citizen@hazardshield.com' }, { assignedZoneId: zones[0]._id });
 
-    // Seed relocation plans for overcapacity zones
-    const reasons = {
-      'Yamuna Bank Colony': 'Annual monsoon flooding exceeds carrying capacity by 28%.',
-      'Rohini Sector 15': 'Population exceeds carrying capacity by 29%.',
-      'Coastal Settlement Alpha': 'Severe cyclone corridor. Population double safe capacity.',
-    };
+    // Seed prioritized relocation plans (Immediate, Short-Term, Medium-Term)
+    const planDefinitions = [
+      {
+        zoneName: 'Chooralmala & Meppadi Habitation',
+        urgencyScore: 98,
+        relocationTier: 'immediate',
+        timelineEstimate: '< 30 Days',
+        reason: 'CRITICAL RED ZONE: Debris flow collapse and severe slope failure. OCI 2.27 exceeds carrying capacity by 127%. Section 34 mandatory relocation.',
+        targetSettlementSites: [
+          { siteId: 'WYN_SAFE_01', siteName: 'Meppadi Upland Resettlement Ridge', location: 'Meppadi South Plateau (Basalt Bedrock)', topsisScore: 0.94, availableCapacity: 8500, slopeDegrees: 5.2, waterLpcd: 155, limitingFactor: 'Transit Access Road Width', suitabilityGrade: 'Class A - Prime Reception Site' },
+          { siteId: 'WYN_SAFE_02', siteName: 'Kalpetta East Terraced Greenfield', location: 'Kalpetta Municipal Buffer', topsisScore: 0.88, availableCapacity: 12000, slopeDegrees: 6.8, waterLpcd: 140, limitingFactor: 'PHC Clinic Expansion Required', suitabilityGrade: 'Class A - Viable Reception Site' }
+        ],
+        sdmaActionDirectives: [
+          'Immediate gazette publication under Section 34 of Disaster Management Act 2005.',
+          'Marshall NDRF & SDRF evacuation corridors to Meppadi Upland Ridge.',
+          'Release Rs. 45 Crore State Disaster Response Fund (SDRF) for transitional pre-fab housing.'
+        ]
+      },
+      {
+        zoneName: 'Yamuna Bank Colony',
+        urgencyScore: 95,
+        relocationTier: 'immediate',
+        timelineEstimate: '< 30 Days',
+        reason: 'Annual monsoonal riverbed overflow exceeds carrying capacity by 28%. Chronic flood inundation line breach.',
+        targetSettlementSites: [
+          { siteId: 'NCR_SAFE_01', siteName: 'Dwarka Integrated Eco-Township Corridor', location: 'Dwarka Sector 28 Buffer', topsisScore: 0.91, availableCapacity: 14500, slopeDegrees: 2.1, waterLpcd: 165, limitingFactor: 'Substation Transformer Augmentation', suitabilityGrade: 'Class A - High Capacity' },
+          { siteId: 'NCR_SAFE_02', siteName: 'Narela Phased Housing Complex', location: 'Narela North Ridge', topsisScore: 0.82, availableCapacity: 8000, slopeDegrees: 1.8, waterLpcd: 135, limitingFactor: 'Sewer Trunk Line Tie-in', suitabilityGrade: 'Class B - Secondary' }
+        ],
+        sdmaActionDirectives: [
+          'Issue evacuation order for 32,000 residents prior to Yamuna Hathnikund barrage release.',
+          'Activate transitional shelters at Dwarka Transit Complex.'
+        ]
+      },
+      {
+        zoneName: 'Chellanam Coastal Hamlet',
+        urgencyScore: 94,
+        relocationTier: 'immediate',
+        timelineEstimate: '< 30 Days',
+        reason: 'Uncontrolled coastal erosion with 4.2m/year shoreline retreat. Breached seawall poses immediate tidal surge hazard.',
+        targetSettlementSites: [
+          { siteId: 'KL_SAFE_01', siteName: 'Kochi Inland Rehabilitation Park', location: 'Puthencruz Highground Sector', topsisScore: 0.89, availableCapacity: 7500, slopeDegrees: 3.5, waterLpcd: 150, limitingFactor: 'Feeder Road Widening', suitabilityGrade: 'Class A - Elevated Inland Zone' }
+        ],
+        sdmaActionDirectives: [
+          'Declare 500m coastal belt non-habitable under coastal protection mandate.',
+          'Initiate permanent land allocation at Puthencruz Inland Park.'
+        ]
+      },
+      {
+        zoneName: 'Dharamshala Kangra Ravine Sector',
+        urgencyScore: 92,
+        relocationTier: 'immediate',
+        timelineEstimate: '< 30 Days',
+        reason: 'Critical cloudburst hazard corridor. High-gradient ravine flash flood risk during active Western Himalayan weather disturbances.',
+        targetSettlementSites: [
+          { siteId: 'HP_SAFE_01', siteName: 'Kangra Valley Plateau Resettlement Zone', location: 'Yol Cantonment Buffer', topsisScore: 0.93, availableCapacity: 6000, slopeDegrees: 4.8, waterLpcd: 145, limitingFactor: 'Water Pipeline Extension', suitabilityGrade: 'Class A - Safe Basalt Plateau' }
+        ],
+        sdmaActionDirectives: [
+          'Prohibit permanent reconstruction in cloudburst torrent channel.',
+          'Deploy automated water-level radar sensors at upstream catchment.'
+        ]
+      },
+      {
+        zoneName: 'Majuli Island Floodplain',
+        urgencyScore: 78,
+        relocationTier: 'short_term',
+        timelineEstimate: '1 - 6 Months',
+        reason: 'Severe seasonal Brahmaputra bankline erosion and annual monsoonal submergence. Pre-monsoon planned relocation.',
+        targetSettlementSites: [
+          { siteId: 'AS_SAFE_01', siteName: 'Jorhat North Highland Township', location: 'Jorhat Elevated Spur', topsisScore: 0.87, availableCapacity: 16000, slopeDegrees: 2.4, waterLpcd: 140, limitingFactor: 'Ferry Transit Capacity', suitabilityGrade: 'Class A - Flood-Free Mainland' }
+        ],
+        sdmaActionDirectives: [
+          'Complete beneficiary enumeration before May 2025 pre-monsoon deadline.',
+          'Begin construction of elevated stilt housing clusters at Jorhat North Spur.'
+        ]
+      },
+      {
+        zoneName: 'Kedarnath Valley Tributary Habitation',
+        urgencyScore: 74,
+        relocationTier: 'short_term',
+        timelineEstimate: '1 - 6 Months',
+        reason: 'Narrow glacial valley subject to seasonal cloudburst debris surges. Relocation required prior to pilgrimage monsoon peak.',
+        targetSettlementSites: [
+          { siteId: 'UK_SAFE_01', siteName: 'Guptkashi Stable Terraces', location: 'Guptkashi South Ridge', topsisScore: 0.86, availableCapacity: 5000, slopeDegrees: 8.5, waterLpcd: 135, limitingFactor: 'Retaining Wall Construction', suitabilityGrade: 'Class B - Geologically Surveyed' }
+        ],
+        sdmaActionDirectives: [
+          'Geological survey clearance for Guptkashi terrace housing plots.',
+          'Phased voluntary shifting incentives for vulnerable families.'
+        ]
+      },
+      {
+        zoneName: 'Pooth Khurd Village',
+        urgencyScore: 56,
+        relocationTier: 'medium_term',
+        timelineEstimate: '6 - 24 Months',
+        reason: 'Marginal slope instability with population approaching environmental carrying capacity. Phased town-planning integration.',
+        targetSettlementSites: [
+          { siteId: 'NCR_SAFE_03', siteName: 'Rohini Sector 36 Urban Extension', location: 'Sector 36 Buffer', topsisScore: 0.85, availableCapacity: 18000, slopeDegrees: 1.5, waterLpcd: 150, limitingFactor: 'School & PHC Provision', suitabilityGrade: 'Class A - Planned Sector' }
+        ],
+        sdmaActionDirectives: [
+          'Incorporate zone boundary into Delhi Master Plan 2041 green buffer.',
+          'Stage infrastructural development at Rohini Extension.'
+        ]
+      }
+    ];
 
     const plans = [];
-    for (const zone of zones) {
-      if (reasons[zone.zoneName]) {
+    for (const def of planDefinitions) {
+      const matchedZone = zones.find(z => z.zoneName === def.zoneName);
+      if (matchedZone) {
         plans.push({
-          zoneId: zone._id,
-          urgencyScore: zone.riskScore + (zone.population > zone.carryingCapacity ? 5 : 0),
+          zoneId: matchedZone._id,
+          urgencyScore: def.urgencyScore,
+          relocationTier: def.relocationTier,
+          timelineEstimate: def.timelineEstimate,
           status: 'pending',
-          reason: reasons[zone.zoneName],
+          reason: def.reason,
           requiresVerifiedHazard: true,
-          targetSettlementSites: [
-            { siteName: 'Dwarka Relocation Transit Complex', safeCapacityAvailable: 4500, distanceKm: 18.2 },
-            { siteName: 'Greater Noida Eco Township Hub', safeCapacityAvailable: 12000, distanceKm: 28.5 },
-          ]
+          targetSettlementSites: def.targetSettlementSites,
+          sdmaActionDirectives: def.sdmaActionDirectives,
         });
       }
     }
     await RelocationPlan.insertMany(plans);
 
-    console.log(`   ✓ Seeded ${zones.length} zones + ${plans.length} relocation plans`);
+    console.log(`   ✓ Seeded ${zones.length} multi-hazard zones + ${plans.length} prioritized relocation plans`);
     console.log('   🔑 Logins:');
     console.log('      • Authority (MHA): admin@hazardshield.com / admin123');
     console.log('      • Authority (StateDMA): state@hazardshield.com / state123');
