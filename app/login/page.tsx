@@ -226,6 +226,14 @@ export default function LoginPage() {
             </div>
           </form>
 
+          {/* Switch to Register */}
+          <div className="mt-5 text-center text-xs text-gray-600">
+            Don't have an account?{' '}
+            <Link href="/register" className="font-bold text-accent hover:text-blue-700 underline">
+              Create an Account (Citizen / Authority)
+            </Link>
+          </div>
+
           {/* Quick-Fill Presets Section */}
           <div className="mt-8 pt-6 border-t border-gray-200">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">

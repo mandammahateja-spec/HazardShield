@@ -98,12 +98,20 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
-              <Link
-                href="/login"
-                className="px-4 py-2 bg-accent hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow-soft transition-colors"
-              >
-                Sign In
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/login"
+                  className="px-3.5 py-1.5 text-gray-700 hover:text-accent font-semibold text-xs rounded-lg transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  className="px-4 py-1.5 bg-accent hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow-soft transition-colors"
+                >
+                  Register
+                </Link>
+              </div>
             )}
           </div>
 
@@ -151,13 +159,22 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
-              <Link
-                href="/login"
-                className="block w-full text-center px-4 py-2.5 bg-accent text-white font-bold text-sm rounded-lg"
-                onClick={() => setIsOpen(false)}
-              >
-                Sign In
-              </Link>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <Link
+                  href="/login"
+                  className="block text-center py-2 px-3 border border-gray-300 text-gray-700 font-bold text-xs rounded-lg hover:bg-gray-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  className="block text-center py-2 px-3 bg-accent text-white font-bold text-xs rounded-lg hover:bg-blue-700"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Register
+                </Link>
+              </div>
             )}
           </div>
         )}
