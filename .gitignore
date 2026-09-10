@@ -1,5 +1,9 @@
 # dependencies
 /node_modules
+/__pycache__/
+**/__pycache__/
+*.py[cod]
+*.tsbuildinfo
 /.pnp
 .pnp.js
 
