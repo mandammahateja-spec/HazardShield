@@ -73,6 +73,8 @@ const register = async (req, res, next) => {
       },
     });
 
+    const jwtSecret = process.env.JWT_SECRET || 'hazardshield_jwt_secret_fallback_key_2026';
+
     // Generate JWT including role + authorityLevel
     const token = jwt.sign(
       {
@@ -83,7 +85,7 @@ const register = async (req, res, next) => {
         authorityLevel: user.authorityLevel,
         assignedZoneId: user.assignedZoneId,
       },
-      process.env.JWT_SECRET,
+      jwtSecret,
       { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
     );
 
@@ -155,6 +157,8 @@ const login = async (req, res, next) => {
 
     const authorityLevel = user.authorityLevel || (user.role === 'admin' ? 'MHA' : user.role === 'official' ? 'DistrictAdmin' : null);
 
+    const jwtSecret = process.env.JWT_SECRET || 'hazardshield_jwt_secret_fallback_key_2026';
+
     // Generate JWT token with full identity payload
     const token = jwt.sign(
       {
@@ -165,7 +169,7 @@ const login = async (req, res, next) => {
         authorityLevel,
         assignedZoneId: user.assignedZoneId,
       },
-      process.env.JWT_SECRET,
+      jwtSecret,
       { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
     );
 

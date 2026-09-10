@@ -50,7 +50,8 @@ const verifyToken = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const jwtSecret = process.env.JWT_SECRET || 'hazardshield_jwt_secret_fallback_key_2026';
+    const decoded = jwt.verify(token, jwtSecret);
     req.user = decoded;
     req.token = token; // Store for logout
     next();
