@@ -119,4 +119,40 @@ async function scoreZone(payload) {
   }
 }
 
-module.exports = { scoreZone, computeFallbackScore };
+/**
+ * Invokes the ML hazard prediction endpoint (/predict-hazard) on the FastAPI service.
+ */
+async function predictHazard(payload) {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+
+    const res = await fetch(`${RISK_ENGINE_URL}/predict-hazard`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn(`[RiskEngineClient] /predict-hazard unavailable (${err.message}). Returning fallback status.`);
+  }
+
+  return {
+    hazard_probability: null,
+    prediction: 'unavailable',
+    risk_level: 'unknown',
+    top_factors: ['ML prediction microservice offline; using deterministic baseline.'],
+    model_version: null,
+    status: 'fallback_unavailable',
+    prediction_window_hours: 72,
+    hazard_type: 'flood',
+  };
+}
+
+module.exports = { scoreZone, computeFallbackScore, predictHazard };

@@ -1,0 +1,83 @@
+{
+  "model_version": "1.0.0",
+  "algorithm": "RandomForestClassifier",
+  "target_hazard": "flood",
+  "prediction_window_hours": 72,
+  "features": [
+    "rainfall_72h_mm",
+    "rainfall_threshold_mm",
+    "soil_saturation_ratio",
+    "terrain_slope_degrees",
+    "drainage_capacity_mm_day",
+    "elevation_meters",
+    "river_distance_meters",
+    "past_recurrence_count",
+    "vulnerability_svi",
+    "rainfall_to_threshold_ratio",
+    "drainage_deficit_ratio"
+  ],
+  "feature_importances": {
+    "rainfall_to_threshold_ratio": 0.3519,
+    "rainfall_72h_mm": 0.2157,
+    "drainage_deficit_ratio": 0.1228,
+    "river_distance_meters": 0.0836,
+    "terrain_slope_degrees": 0.0531,
+    "soil_saturation_ratio": 0.0417,
+    "rainfall_threshold_mm": 0.0344,
+    "past_recurrence_count": 0.0301,
+    "drainage_capacity_mm_day": 0.028,
+    "elevation_meters": 0.0197,
+    "vulnerability_svi": 0.0189
+  },
+  "dataset_type": "synthetic_demo",
+  "dataset_source": "demo_flood_hazard_data.csv",
+  "trained_timestamp": "2026-09-10T15:56:44.994325+00:00",
+  "random_seed": 42,
+  "hyperparameters": {
+    "n_estimators": 150,
+    "max_depth": 8,
+    "class_weight": "balanced",
+    "min_samples_split": 6,
+    "min_samples_leaf": 3
+  },
+  "evaluation_metrics": {
+    "validation": {
+      "accuracy": 0.8758,
+      "precision": 0.9064,
+      "recall": 0.8326,
+      "f1_score": 0.8679,
+      "roc_auc": 0.9259,
+      "brier_score": 0.0995,
+      "confusion_matrix": {
+        "true_negatives": 211,
+        "false_positives": 19,
+        "false_negatives": 37,
+        "true_positives": 184
+      },
+      "sample_counts": {
+        "total_test_samples": 451,
+        "actual_positive_hazards": 221,
+        "actual_negative_hazards": 230
+      }
+    },
+    "test": {
+      "accuracy": 0.8933,
+      "precision": 0.9303,
+      "recall": 0.8462,
+      "f1_score": 0.8863,
+      "roc_auc": 0.9397,
+      "brier_score": 0.0866,
+      "confusion_matrix": {
+        "true_negatives": 215,
+        "false_positives": 14,
+        "false_negatives": 34,
+        "true_positives": 187
+      },
+      "sample_counts": {
+        "total_test_samples": 450,
+        "actual_positive_hazards": 221,
+        "actual_negative_hazards": 229
+      }
+    }
+  }
+}

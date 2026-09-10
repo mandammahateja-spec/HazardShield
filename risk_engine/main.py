@@ -1,13 +1,16 @@
 import math
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+# ML Inference imports
+from risk_engine.ml.predict import predict_hazard, is_model_available
+
 app = FastAPI(
-    title="HazardShield Risk Engine",
-    description="Mathematical computation service for Dynamic Risk Score (DRS), Carrying Capacity (ECC), and Overcapacity Index (OCI)",
-    version="1.0.0",
+    title="HazardShield Risk & ML Prediction Engine",
+    description="Mathematical computation service for Dynamic Risk Score (DRS), Carrying Capacity (ECC), Overcapacity Index (OCI), and ML-based 72h Hazard Probability Forecasting.",
+    version="1.2.0",
 )
 
 app.add_middleware(
@@ -18,15 +21,54 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# -----------------------------------------------------------------------------
+# 1. Pydantic Schemas: ML Prediction Endpoint
+# -----------------------------------------------------------------------------
+
+class HazardPredictInput(BaseModel):
+    zone_id: Optional[str] = "Zone_Telemetry"
+    zone_name: Optional[str] = "Monitored Zone"
+    rainfall_72h_mm: Optional[float] = Field(50.0, ge=0.0, description="Cumulative 72-hour precipitation (mm)")
+    rainfall_threshold_mm: Optional[float] = Field(85.0, gt=0.0, description="Safe terrain precipitation threshold (mm)")
+    soil_saturation_ratio: Optional[float] = Field(0.50, ge=0.0, le=1.0, description="Antecedent soil moisture (0.0 to 1.0)")
+    terrain_slope_degrees: Optional[float] = Field(4.5, ge=0.0, description="Mean ground slope (degrees)")
+    drainage_capacity_mm_day: Optional[float] = Field(65.0, gt=0.0, description="Drainage capacity (mm/day)")
+    elevation_meters: Optional[float] = Field(120.0, ge=-50.0, description="Elevation above sea level (meters)")
+    river_distance_meters: Optional[float] = Field(1500.0, ge=0.0, description="Distance to nearest major river/channel (meters)")
+    past_recurrence_count: Optional[int] = Field(1, ge=0, description="Historical hazard recurrence count")
+    vulnerability_svi: Optional[float] = Field(50.0, ge=0.0, le=100.0, description="Vulnerability index (0-100)")
+    
+    # Aliases for seamless compatibility with ZoneScoreInput
+    rainfall_mm: Optional[float] = None
+    rainfall_thresh: Optional[float] = None
+    soil_saturation: Optional[float] = None
+    slope_degrees: Optional[float] = None
+    drainage_capacity: Optional[float] = None
+    vulnerability_score: Optional[float] = None
+
+class HazardPredictOutput(BaseModel):
+    hazard_probability: Optional[float]
+    prediction: str
+    risk_level: str
+    top_factors: List[str]
+    model_version: Optional[str]
+    hazard_type: str
+    prediction_window_hours: int
+    status: str
+
+# -----------------------------------------------------------------------------
+# 2. Pydantic Schemas: Zone Scoring & Carrying Capacity Engine
+# -----------------------------------------------------------------------------
+
 class ZoneScoreInput(BaseModel):
     zone_id: str
     zone_name: Optional[str] = "Monitored Zone"
     hazard_type: Optional[str] = "flood"
     population: int = Field(..., gt=0, description="Actual population count (P_actual)")
     mhi_baseline: Optional[float] = Field(50.0, ge=0.0, le=100.0, description="Multi-Hazard Index baseline")
-    hazard_intensity_score: Optional[float] = Field(50.0, ge=0.0, le=100.0, description="Peak hazard intensity (rainfall, slope shear, wave height, cloudburst rate)")
+    hazard_intensity_score: Optional[float] = Field(50.0, ge=0.0, le=100.0, description="Peak hazard intensity score (0-100)")
     vulnerability_score: Optional[float] = Field(50.0, ge=0.0, le=100.0, description="Social & infrastructure vulnerability index (0-100)")
-    disaster_history_score: Optional[float] = Field(50.0, ge=0.0, le=100.0, description="Historical recurrence frequency and cumulative disaster damage (0-100)")
+    disaster_history_score: Optional[float] = Field(50.0, ge=0.0, le=100.0, description="Historical recurrence frequency (0-100)")
     rainfall_mm: Optional[float] = Field(0.0, ge=0.0, description="72-hour simulated or actual cumulative rainfall (R_cum)")
     rainfall_thresh: Optional[float] = Field(85.0, gt=0.0, description="Zone rainfall threshold (R_thresh)")
     alpha: Optional[float] = Field(1.0, gt=0.0, description="Terrain soil saturation sensitivity coefficient")
@@ -39,6 +81,13 @@ class ZoneScoreInput(BaseModel):
     evac_flow_rate: Optional[int] = Field(1800, gt=0, description="Hourly evacuation flow in people/hr")
     target_evac_hours: Optional[float] = Field(4.5, gt=0.0, description="Allowable safe evacuation hours")
     verified_hazard_reports_count: Optional[int] = Field(0, ge=0, description="Number of citizen reports verified by authority")
+    
+    # Extended ML telemetry inputs (optional with defaults for full backward compatibility)
+    soil_saturation: Optional[float] = Field(0.50, ge=0.0, le=1.0, description="Soil saturation ratio")
+    slope_degrees: Optional[float] = Field(4.5, ge=0.0, description="Terrain slope in degrees")
+    drainage_capacity_mm_day: Optional[float] = Field(65.0, gt=0.0, description="Drainage clearance rate")
+    river_distance_meters: Optional[float] = Field(1500.0, ge=0.0, description="Distance to river/channel")
+    enable_ml_integration: Optional[bool] = Field(True, description="Whether to incorporate ML hazard prediction into scoring")
 
 class ZoneScoreOutput(BaseModel):
     zone_id: str
@@ -60,40 +109,112 @@ class ZoneScoreOutput(BaseModel):
     rpi_urgency_score: float
     recommended_action: str
     capacities_breakdown: dict
+    
+    # ML integration metadata (transparent, non-breaking additions)
+    ml_hazard_probability: Optional[float] = None
+    ml_risk_level: Optional[str] = None
+    ml_top_factors: Optional[List[str]] = None
+    ml_model_version: Optional[str] = None
+    ml_status: Optional[str] = "fallback_unavailable"
+
+# -----------------------------------------------------------------------------
+# 3. Health Endpoint
+# -----------------------------------------------------------------------------
 
 @app.get("/health")
 def health_check():
+    ml_ready = is_model_available()
     return {
         "status": "healthy",
         "service": "HazardShield Multi-Hazard & Carrying Capacity Risk Engine",
         "framework": "FastAPI",
-        "version": "1.1.0",
+        "version": "1.2.0",
+        "ml_engine": {
+            "status": "active" if ml_ready else "offline_fallback",
+            "model_type": "RandomForestClassifier",
+            "primary_hazard": "flood",
+            "prediction_window": "72h",
+        },
         "supported_hazards": ["landslide", "flood", "coastal_erosion", "cloudburst", "earthquake", "cyclone"]
     }
 
-@app.post("/score-zone")
+# -----------------------------------------------------------------------------
+# 4. Standalone ML Hazard Prediction Endpoint
+# -----------------------------------------------------------------------------
+
+@app.post("/predict-hazard", response_model=HazardPredictOutput)
+def predict_hazard_endpoint(input_data: HazardPredictInput):
+    """
+    Predicts the empirical 72-hour probability of a hazard event using the trained Random Forest model.
+    Returns probability (0.00-1.00), categorical risk level, model version, and top-3 explainability factors.
+    Falls back gracefully to deterministic status if the model artifact is offline.
+    """
+    raw_dict = input_data.model_dump()
+    result = predict_hazard(raw_dict)
+    return HazardPredictOutput(**result)
+
+# -----------------------------------------------------------------------------
+# 5. Core Zone Scoring & Carrying Capacity Endpoint
+# -----------------------------------------------------------------------------
+
+@app.post("/score-zone", response_model=ZoneScoreOutput)
 def score_zone(input_data: ZoneScoreInput):
     """
     Computes DRS, ECC, OCI, Red Zone designation, and 3-tier relocation prioritization using:
     - 3-Pillar Evidence: Hazard Intensity (40%), Vulnerability (35%), Disaster History (25%)
+    - ML Hazard Prediction Calibration: Incorporates empirical 72h flood breach probability into Pillar 1
     - Dynamic Risk Score: DRS = Pillar_Baseline * [ 1 + alpha * ((R_cum - R_thresh) / R_thresh) ]
     - Multi-factor Carrying Capacity: ECC = min(RCC, C_water, C_sewer, C_power, C_transport, C_evac)
     - Relocation Horizon: Immediate (<30 days), Short-Term (1-6 months), Medium-Term (6-24 months)
     """
     try:
-        # 1. Three-Pillar Baseline Integration
-        h_score = input_data.hazard_intensity_score if input_data.hazard_intensity_score is not None else 50.0
+        # 1. ML Prediction Layer Integration (Safe & Transparent Fallback)
+        ml_prob: Optional[float] = None
+        ml_risk_level: Optional[str] = None
+        ml_top_factors: Optional[List[str]] = None
+        ml_version: Optional[str] = None
+        ml_status = "fallback_unavailable"
+
+        if input_data.enable_ml_integration and is_model_available():
+            ml_input = {
+                "rainfall_72h_mm": input_data.rainfall_mm,
+                "rainfall_threshold_mm": input_data.rainfall_thresh,
+                "soil_saturation_ratio": input_data.soil_saturation,
+                "terrain_slope_degrees": input_data.slope_degrees,
+                "drainage_capacity_mm_day": input_data.drainage_capacity_mm_day,
+                "river_distance_meters": input_data.river_distance_meters,
+                "past_recurrence_count": int(round((input_data.disaster_history_score or 50.0) / 20.0)),
+                "vulnerability_svi": input_data.vulnerability_score or 50.0,
+            }
+            ml_res = predict_hazard(ml_input)
+            if ml_res.get("status") == "active":
+                ml_prob = ml_res.get("hazard_probability")
+                ml_risk_level = ml_res.get("risk_level")
+                ml_top_factors = ml_res.get("top_factors")
+                ml_version = ml_res.get("model_version")
+                ml_status = "active"
+
+        # 2. Three-Pillar Baseline Integration
+        raw_h_score = input_data.hazard_intensity_score if input_data.hazard_intensity_score is not None else 50.0
         v_score = input_data.vulnerability_score if input_data.vulnerability_score is not None else 50.0
         d_score = input_data.disaster_history_score if input_data.disaster_history_score is not None else 50.0
 
+        # When ML probability is active, calibrate Pillar 1 (Hazard Intensity)
+        # Blends physical sensor reading with ML prediction: 50% physical gauge score + 50% (P_ML * 100)
+        if ml_status == "active" and ml_prob is not None:
+            calibrated_h_score = round(0.50 * raw_h_score + 0.50 * (ml_prob * 100.0), 1)
+        else:
+            calibrated_h_score = raw_h_score
+
         # Weighted composite baseline
-        pillar_baseline = (0.40 * h_score) + (0.35 * v_score) + (0.25 * d_score)
+        pillar_baseline = (0.40 * calibrated_h_score) + (0.35 * v_score) + (0.25 * d_score)
         base_mhi = input_data.mhi_baseline if (input_data.mhi_baseline and input_data.mhi_baseline != 50.0) else pillar_baseline
 
         r_cum = input_data.rainfall_mm or 0.0
         r_thresh = input_data.rainfall_thresh or 85.0
         alpha = input_data.alpha or 1.0
 
+        # Dynamic Risk Score (DRS)
         if r_cum <= 0.0:
             drs = base_mhi
         elif r_cum <= r_thresh:
@@ -110,7 +231,7 @@ def score_zone(input_data: ZoneScoreInput):
 
         drs = min(100.0, max(5.0, round(drs, 1)))
 
-        # 2. Environmental Carrying Capacity (ECC) Multi-Factor Minimization
+        # 3. Environmental Carrying Capacity (ECC) Multi-Factor Minimization
         p_actual = input_data.population
         rcc = input_data.rcc or 8000
         lpcd = max(20.0, input_data.water_lpcd or 135.0)
@@ -133,26 +254,27 @@ def score_zone(input_data: ZoneScoreInput):
         capacities.sort(key=lambda x: x[1])
         limiting_name, ecc = capacities[0]
 
-        # 3. Overcapacity Index (OCI) = P_actual / ECC
+        # 4. Overcapacity Index (OCI) = P_actual / ECC
         raw_oci = p_actual / max(1, ecc)
         oci = round(raw_oci, 2)
         is_overcapacity = oci > 1.0
 
-        # 4. Zone Classification & Red Zone Status (Unsuitable for Habitation)
-        is_red_zone = drs >= 70.0 or (drs >= 60.0 and is_overcapacity)
+        # 5. Zone Classification & Red Zone Status
+        # Red zone designation: DRS >= 70 OR (DRS >= 60 AND overcapacity) OR (ML hazard probability >= 0.85 AND overcapacity)
+        is_red_zone = drs >= 70.0 or (drs >= 60.0 and is_overcapacity) or (ml_prob is not None and ml_prob >= 0.85 and is_overcapacity)
         if is_red_zone:
             classification = "red"
-        elif drs >= 45.0:
+        elif drs >= 45.0 or (ml_prob is not None and ml_prob >= 0.65):
             classification = "yellow"
         else:
             classification = "green"
 
-        # 5. Relocation Priority Index (RPI Urgency Score 0-100)
+        # 6. Relocation Priority Index (RPI Urgency Score 0-100)
         oci_factor = min(100.0, oci * 50.0)
         rpi = round(0.6 * drs + 0.4 * oci_factor, 1)
         rpi = min(100.0, max(0.0, rpi))
 
-        # 6. Relocation Horizon Categorization (Immediate / Short-Term / Medium-Term)
+        # 7. Relocation Horizon Categorization
         if rpi >= 75.0 or (classification == "red" and oci >= 1.3):
             relocation_tier = "immediate"
             recommended_action = "Immediate Relocation Directive (<30 Days): Critical Red Zone breach. Marshall transitional shelters & trigger Section 34 DM Act evacuation."
@@ -172,7 +294,7 @@ def score_zone(input_data: ZoneScoreInput):
             "hazard_type": input_data.hazard_type or "flood",
             "population": p_actual,
             "mhi_baseline": round(base_mhi, 1),
-            "hazard_intensity_score": round(h_score, 1),
+            "hazard_intensity_score": round(calibrated_h_score, 1),
             "vulnerability_score": round(v_score, 1),
             "disaster_history_score": round(d_score, 1),
             "drs_score": drs,
@@ -192,11 +314,16 @@ def score_zone(input_data: ZoneScoreInput):
                 "c_power": c_power,
                 "c_transport": c_transport,
                 "c_evac": c_evac,
-            }
+            },
+            "ml_hazard_probability": ml_prob,
+            "ml_risk_level": ml_risk_level,
+            "ml_top_factors": ml_top_factors,
+            "ml_model_version": ml_version,
+            "ml_status": ml_status,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Scoring calculation error: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("risk_engine.main:app", host="127.0.0.1", port=8000, reload=True)
