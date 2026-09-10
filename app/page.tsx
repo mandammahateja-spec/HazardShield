@@ -20,6 +20,7 @@ import {
   ArrowRightIcon,
   ShieldCheckIcon,
   ClockIcon,
+  CheckBadgeIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useRequireAuth } from '@/lib/context/AuthContext';
@@ -33,6 +34,7 @@ import TopsisRecommenderModal from '@/components/simulation/TopsisRecommenderMod
 import DdmaReportModal from '@/components/simulation/DdmaReportModal';
 import VoiceAlertModal from '@/components/simulation/VoiceAlertModal';
 import JoshimathCaseStudyModal from '@/components/simulation/JoshimathCaseStudyModal';
+import HazardVerificationModal from '@/components/simulation/HazardVerificationModal';
 
 export default function Dashboard() {
   // Simulation & Modal States
@@ -40,7 +42,7 @@ export default function Dashboard() {
   const [selectedZoneId, setSelectedZoneId] = useState<string>('zone_001');
   const [infrastructureParams, setInfrastructureParams] = useState<InfrastructureParameters>(DEFAULT_INFRASTRUCTURE_PARAMS);
   const [activeModal, setActiveModal] = useState<
-    null | 'oci' | 'bottlenecks' | 'topsis' | 'ddma' | 'voice' | 'joshimath'
+    null | 'oci' | 'bottlenecks' | 'topsis' | 'ddma' | 'voice' | 'joshimath' | 'verification'
   >(null);
 
   // Dynamic real-time calculations using core engines
@@ -118,6 +120,14 @@ export default function Dashboard() {
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-3">
                 <button
+                  onClick={() => setActiveModal('verification')}
+                  className="px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-900 font-medium text-sm rounded-lg border border-amber-300 shadow-soft transition-colors flex items-center gap-2"
+                >
+                  <CheckBadgeIcon className="w-4 h-4 text-amber-700" />
+                  <span>Verify Citizen Hazards</span>
+                  <span className="w-2 h-2 rounded-full bg-amber-600 animate-ping" />
+                </button>
+                <button
                   onClick={() => setActiveModal('ddma')}
                   className="px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 font-medium text-sm rounded-lg border border-gray-300 shadow-soft transition-colors flex items-center gap-2"
                 >
@@ -189,7 +199,21 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+              <button
+                onClick={() => setActiveModal('verification')}
+                className="p-3.5 rounded-xl border border-amber-300 hover:border-amber-500 bg-amber-50/70 hover:bg-amber-100/60 text-left transition-all flex flex-col justify-between group shadow-sm ring-1 ring-amber-200"
+              >
+                <div className="w-8 h-8 rounded-lg bg-amber-200 text-amber-900 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform relative">
+                  <CheckBadgeIcon className="w-4 h-4" />
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-600 border border-white" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-gray-900 block leading-tight">Hazard Verification</span>
+                  <span className="text-[10px] text-amber-800 font-semibold">Review ground reports</span>
+                </div>
+              </button>
+
               <button
                 onClick={() => setActiveModal('oci')}
                 className="p-3.5 rounded-xl border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-blue-50/50 text-left transition-all flex flex-col justify-between group shadow-sm"
@@ -597,6 +621,12 @@ export default function Dashboard() {
       <JoshimathCaseStudyModal
         isOpen={activeModal === 'joshimath'}
         onClose={() => setActiveModal(null)}
+      />
+
+      <HazardVerificationModal
+        isOpen={activeModal === 'verification'}
+        onClose={() => setActiveModal(null)}
+        zones={hazardZonesData}
       />
     </>
   );

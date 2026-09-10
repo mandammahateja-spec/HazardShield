@@ -13,18 +13,74 @@ import {
   SparklesIcon,
   ChartBarSquareIcon,
   BuildingLibraryIcon,
+  CheckBadgeIcon,
+  LockClosedIcon,
+  SpeakerWaveIcon,
 } from '@heroicons/react/24/outline';
 import TopsisRecommenderModal from '@/components/simulation/TopsisRecommenderModal';
 import EvacuationBottleneckModal from '@/components/simulation/EvacuationBottleneckModal';
+import VoiceAlertModal from '@/components/simulation/VoiceAlertModal';
 import { CANDIDATE_RESETTLEMENT_SITES, rankResettlementSitesTopsis } from '@/lib/engine/topsisEngine';
-import { useRequireAuth } from '@/lib/context/AuthContext';
+import { useRequireAuth, useAuth } from '@/lib/context/AuthContext';
 
 export default function RelocationPage() {
   const { isAuthorized } = useRequireAuth(['authority']);
-  const [activeModal, setActiveModal] = useState<null | 'topsis' | 'bottlenecks'>(null);
+  const { user, token } = useAuth();
+  const [activeModal, setActiveModal] = useState<null | 'topsis' | 'bottlenecks' | 'voice'>(null);
   const [modalZoneId, setModalZoneId] = useState<string>('zone_wayanad');
   const [selectedTier, setSelectedTier] = useState<'all' | RelocationTier>('all');
   const [activeTab, setActiveTab] = useState<'habitations' | 'alternative_sites'>('habitations');
+
+  // Executive Relocation Directive Approvals under Section 34 of Disaster Management Act 2005
+  const [approvedDirectives, setApprovedDirectives] = useState<Record<string, {
+    approvedBy: string;
+    approvedAt: string;
+    refNo: string;
+    targetSite: string;
+  }>>({
+    zone_wayanad: {
+      approvedBy: 'StateDMA Executive Council',
+      approvedAt: '08 Sept 2024, 11:30 IST',
+      refNo: 'SDMA/KER/RELOC/SEC34-WND-01',
+      targetSite: 'Vythiri Highland Plateau Reception Buffer',
+    },
+  });
+
+  const handleApproveDirective = async (zone: HazardZone) => {
+    const authorityName = user?.name || (user?.authorityLevel === 'MHA' ? 'Ministry of Home Affairs' : 'State Disaster Management Authority');
+    const refNo = `SDMA/SEC34/2026/ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+    const candidateSites = CANDIDATE_RESETTLEMENT_SITES[zone.id] || [];
+    const topSite = candidateSites[0]?.name || 'Audited TOPSIS Resettlement Corridor';
+
+    if (token) {
+      try {
+        const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        await fetch(`${API_BASE}/api/authority/relocation/${zone.id}/approve`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            status: 'approved',
+            shelterId: topSite,
+          }),
+        });
+      } catch (err) {
+        console.warn('Fallback to local approval state:', err);
+      }
+    }
+
+    setApprovedDirectives((prev) => ({
+      ...prev,
+      [zone.id]: {
+        approvedBy: `${authorityName} (${user?.authorityLevel || 'StateDMA'})`,
+        approvedAt: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        refNo,
+        targetSite: topSite,
+      },
+    }));
+  };
 
   // Sort by urgency score (highest first)
   const prioritizedZones = [...hazardZonesData].sort((a, b) => b.urgencyScore - a.urgencyScore);
@@ -421,6 +477,54 @@ export default function RelocationPage() {
                             <ArrowPathIcon className="w-4 h-4 text-slate-500" />
                             Evacuation Bottleneck Analysis
                           </button>
+
+                          {/* Section 34 Relocation Priority Approval Block */}
+                          {approvedDirectives[zone.id] ? (
+                            <div className="bg-emerald-50 border border-emerald-300 rounded-lg p-2.5 text-xs space-y-1.5">
+                              <div className="flex items-center gap-1.5 text-emerald-900 font-bold">
+                                <CheckBadgeIcon className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                                <span>Relocation Directive Gazetted</span>
+                              </div>
+                              <p className="text-[10px] text-emerald-800 font-mono">
+                                Ref: {approvedDirectives[zone.id].refNo}
+                              </p>
+                              <p className="text-[10px] text-emerald-700">
+                                Sign-off: {approvedDirectives[zone.id].approvedBy}
+                              </p>
+                              <p className="text-[10px] text-emerald-900 font-medium line-clamp-1">
+                                Corridor: {approvedDirectives[zone.id].targetSite}
+                              </p>
+                              <button
+                                onClick={() => {
+                                  setModalZoneId(zone.id);
+                                  setActiveModal('voice');
+                                }}
+                                className="w-full mt-1 py-1.5 px-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold text-[11px] flex items-center justify-center gap-1 transition-colors shadow-sm"
+                              >
+                                <SpeakerWaveIcon className="w-3.5 h-3.5" />
+                                Dispatch Alert to Residents
+                              </button>
+                            </div>
+                          ) : (
+                            <div>
+                              {(user?.authorityLevel === 'StateDMA' || user?.authorityLevel === 'MHA' || !user?.authorityLevel) ? (
+                                <button
+                                  onClick={() => handleApproveDirective(zone)}
+                                  className="w-full py-2 px-3 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+                                >
+                                  <CheckBadgeIcon className="w-4 h-4" />
+                                  Approve Relocation Directive (Section 34)
+                                </button>
+                              ) : (
+                                <div className="p-2 rounded-lg bg-amber-50 border border-amber-200 text-[11px] text-amber-800 flex items-start gap-1.5">
+                                  <LockClosedIcon className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                                  <div>
+                                    <span className="font-bold">Approval Gated:</span> Section 34 relocation requires StateDMA or MHA sign-off (Logged as {user?.authorityLevel || 'DistrictAdmin'}).
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -573,6 +677,15 @@ export default function RelocationPage() {
       {/* Evacuation Bottlenecks Modal */}
       <EvacuationBottleneckModal
         isOpen={activeModal === 'bottlenecks'}
+        onClose={() => setActiveModal(null)}
+        zones={hazardZonesData}
+        selectedZoneId={modalZoneId}
+        onSelectZoneId={setModalZoneId}
+      />
+
+      {/* Multilingual Voice / SMS Alert Dispatch Modal */}
+      <VoiceAlertModal
+        isOpen={activeModal === 'voice'}
         onClose={() => setActiveModal(null)}
         zones={hazardZonesData}
         selectedZoneId={modalZoneId}
